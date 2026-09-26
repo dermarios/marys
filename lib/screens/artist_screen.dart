@@ -313,16 +313,10 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   const SizedBox(height: 24),
                   _cabecalho('Mais tocadas', 'ESTE MÊS'),
                   const SizedBox(height: 11),
-                  Glass(
-                    mode: _mode,
-                    radius: 24,
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        for (var i = 0; i < _top.length; i++) _linhaTop(i),
-                      ],
-                    ),
-                  ),
+                  for (var i = 0; i < _top.length; i++) ...[
+                    _linhaTop(i),
+                    if (i < _top.length - 1) const SizedBox(height: 8),
+                  ],
                 ],
               ),
             ),
@@ -359,64 +353,66 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
     if (album) _abrirPlayer();
   }
 
+  // Mais tocadas: um card de vidro por faixa, sem capa colorida.
   Widget _linhaTop(int i) {
     final t = _top[i];
     final atual = widget.audioService.currentTrack?.title.toLowerCase() == t.titulo.toLowerCase();
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _tocarPorTitulo(t.titulo),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: atual ? Colors.white.withOpacity(0.12) : Colors.transparent,
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 19,
-              child: Text('${i + 1}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(atual ? 1 : 0.55))),
+      child: Stack(
+        children: [
+          Glass(
+            mode: _mode,
+            radius: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  child: Text('${i + 1}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withOpacity(atual ? 1 : 0.55))),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(t.titulo,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 14.5, fontWeight: FontWeight.w500, color: Colors.white)),
+                      Text('${t.plays} reproduções',
+                          style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.62))),
+                    ],
+                  ),
+                ),
+                Text(t.dur,
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.58))),
+              ],
             ),
-            const SizedBox(width: 11),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(11),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: kPaletas[i % kPaletas.length].take(2).toList(),
+          ),
+          // faixa atual: contorno claro por cima do vidro
+          if (atual)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.5)),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 11),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t.titulo,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                  Text('${t.plays} reproduções',
-                      style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.62))),
-                ],
-              ),
-            ),
-            Text(t.dur,
-                style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.58))),
-          ],
-        ),
+        ],
       ),
     );
   }
