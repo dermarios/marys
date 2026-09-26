@@ -9,12 +9,13 @@ import 'screens/artist_screen.dart';
 import 'widgets/mini_player.dart';
 
 late LockScreenAudioHandler audioHandler;
+late pitty_audio.PittyAudioService audioService;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   print('🔄 Initializing AudioService...');
-  audioHandler = await AudioService.init(
+  final handler = await AudioService.init(
     builder: () => LockScreenAudioHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.forven.pittyplayer.channel.audio',
@@ -22,8 +23,12 @@ void main() async {
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),
-  ) as LockScreenAudioHandler;
+  );
+  audioHandler = handler as LockScreenAudioHandler;
   print('✅ AudioService ready');
+
+  audioService = pitty_audio.PittyAudioService(audioHandler);
+  print('✅ PittyAudioService created');
 
   runApp(const MyApp());
 }
@@ -33,26 +38,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final audioService = pitty_audio.PittyAudioService(audioHandler);
-
     return MaterialApp(
       title: 'Just',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: HomeWithSwipe(audioService: audioService),
+      home: const HomeWithSwipe(),
     );
   }
 }
 
 class HomeWithSwipe extends StatefulWidget {
-  final pitty_audio.PittyAudioService audioService;
-
-  const HomeWithSwipe({
-    super.key,
-    required this.audioService,
-  });
+  const HomeWithSwipe({super.key});
 
   @override
   State<HomeWithSwipe> createState() => _HomeWithSwipeState();
@@ -79,21 +77,21 @@ class _HomeWithSwipeState extends State<HomeWithSwipe> {
       controller: _pageController,
       children: [
         ArtistScreen(
-          audioService: widget.audioService,
+          audioService: audioService,
         ),
         LiquidPlayerScreen(
-          audioService: widget.audioService,
+          audioService: audioService,
         ),
         PlayerShell(
-          audioService: widget.audioService,
+          audioService: audioService,
           child: GalleryScreen(
-            audioService: widget.audioService,
+            audioService: audioService,
           ),
         ),
         PlayerShell(
-          audioService: widget.audioService,
+          audioService: audioService,
           child: CreditsScreen(
-            audioService: widget.audioService,
+            audioService: audioService,
           ),
         ),
       ],
