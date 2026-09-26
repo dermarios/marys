@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'package:msb_just/screens/liquid_player_screen.dart';
-import 'package:msb_just/services/audio_service.dart';
+import '../screens/liquid_player_screen.dart';
+import '../services/audio_service.dart';
 
 /// Envolve qualquer tela e coloca o player flutuante no rodapé.
 ///
@@ -25,6 +25,7 @@ class PlayerShell extends StatelessWidget {
           bottom: MediaQuery.of(context).padding.bottom + 8,
           child: MiniPlayer(audioService: audioService),
         ),
+        // convite para expandir: pílula de vidro na borda superior do mini player
         if (audioService.currentTrack != null)
           Positioned(
             left: 0,
@@ -63,25 +64,14 @@ class MiniPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
-      child: ListenableBuilder(
-        listenable: Listenable.merge([
-          audioService.currentTrackNotifier,
-          audioService.currentAlbumNotifier,
-          audioService.playerExpandedNotifier,
-        ]),
-        builder: (context, _) {
+      child: StreamBuilder<PlayerState>(
+        stream: _p.playerStateStream,
+        builder: (context, snap) {
           final track = audioService.currentTrack;
-          if (track == null || audioService.playerExpandedNotifier.value) {
-            return const SizedBox.shrink();
-          }
-          return StreamBuilder<PlayerState>(
-            stream: _p.playerStateStream,
-            builder: (context, snap) {
-              final tocando = snap.data?.playing ?? false;
-              final faixas = audioService.currentAlbumNotifier.value?.tracks ??
-                  audioService.tracks;
-              final i = faixas.indexOf(track).clamp(0, 999);
-              final paleta = kPaletas[i % kPaletas.length];
+          if (track == null) return const SizedBox.shrink();
+          final tocando = snap.data?.playing ?? false;
+          final i = audioService.tracks.indexOf(track).clamp(0, 999);
+          final paleta = kPaletas[i % kPaletas.length];
 
           return GestureDetector(
             onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
@@ -124,7 +114,7 @@ class MiniPlayer extends StatelessWidget {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white)),
-                                Text('Mary\'s Secret Box',
+                                Text('Pitty',
                                     style: TextStyle(
                                         fontSize: 11.5, color: Colors.white.withOpacity(0.65))),
                               ],
@@ -166,14 +156,13 @@ class MiniPlayer extends StatelessWidget {
                 ),
               ),
             ),
-            );
-            },
           );
         },
       ),
     );
   }
 }
+
 
 /// Pílula de vidro discreta (36×20) com seta que "respira" 1,5 px.
 class BotaoExpandir extends StatefulWidget {
@@ -204,7 +193,7 @@ class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProvider
         onTap: widget.onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8), // área de toque maior que o visual
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: BackdropFilter(
