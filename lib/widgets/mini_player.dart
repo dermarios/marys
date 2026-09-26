@@ -4,63 +4,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:msb_just/screens/liquid_player_screen.dart';
 import 'package:msb_just/services/audio_service.dart';
 
-class ExpandIndicator extends StatefulWidget {
-  const ExpandIndicator({super.key});
-
-  @override
-  State<ExpandIndicator> createState() => _ExpandIndicatorState();
-}
-
-class _ExpandIndicatorState extends State<ExpandIndicator>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _translateAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _translateAnimation = Tween<double>(begin: 0.0, end: -3.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_scaleAnimation, _translateAnimation]),
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _translateAnimation.value),
-          child: Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Icon(
-              Icons.expand_less_rounded,
-              color: Colors.white.withOpacity(0.8),
-              size: 22,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 /// Envolve qualquer tela e coloca o player flutuante no rodapé.
 ///
 ///   PlayerShell(audioService: s, child: LibraryScreen(audioService: s))
@@ -175,11 +118,7 @@ class MiniPlayer extends StatelessWidget {
                             icon: Icon(tocando ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                 color: Colors.white, size: 26),
                           ),
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: Center(child: const ExpandIndicator()),
-                          ),
+                          _AnimatedExpandIndicator(),
                           const SizedBox(width: 4),
                         ],
                       ),
@@ -216,6 +155,54 @@ class MiniPlayer extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _AnimatedExpandIndicator extends StatefulWidget {
+  const _AnimatedExpandIndicator();
+
+  @override
+  State<_AnimatedExpandIndicator> createState() => _AnimatedExpandIndicatorState();
+}
+
+class _AnimatedExpandIndicatorState extends State<_AnimatedExpandIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final value = _controller.value;
+        return Padding(
+          padding: EdgeInsets.only(top: value * 3),
+          child: Opacity(
+            opacity: 0.6 + (0.3 * (1 - (value - 0.5).abs() * 2)),
+            child: Icon(
+              Icons.expand_less_rounded,
+              color: Colors.white,
+              size: 20 + value * 2,
+            ),
+          ),
+        );
+      },
     );
   }
 }
