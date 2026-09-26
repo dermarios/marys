@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import '../models/track.dart';
@@ -10,17 +11,36 @@ class PittyAudioService {
   late AudioPlayer _player;
   late LockScreenAudioHandler _audioHandler;
   List<Track> _tracks = [];
-  Track? _currentTrack;
+  Album? _currentAlbum;
   bool _tracksLoaded = false;
   int _repeatMode = 0;
   bool _shuffleMode = false;
-  StreamSubscription<PlayerState>? _repeatListener;
   Set<String> _likedTracks = {};
   final _random = math.Random();
+  Future<void>? _cargaInicial;
+
+  StreamSubscription<int?>? _currentIndexSubscription;
+
+  late final ValueNotifier<Track?> currentTrackNotifier;
+  late final ValueNotifier<Album?> currentAlbumNotifier;
+
+  final _opQueue = <Future<void> Function()>[];
+  bool _emExecucao = false;
 
   PittyAudioService(this._audioHandler) {
     _player = _audioHandler.player;
+    currentTrackNotifier = ValueNotifier<Track?>(null);
+    currentAlbumNotifier = ValueNotifier<Album?>(null);
     _initializeAudioSession().ignore();
+    _setupCurrentTrackListener();
+  }
+
+  void _setupCurrentTrackListener() {
+    _currentIndexSubscription = _player.currentIndexStream.listen((index) {
+      if (index != null && index < _tracks.length) {
+        currentTrackNotifier.value = _tracks[index];
+      }
+    });
   }
 
   Future<void> _initializeAudioSession() async {
@@ -32,65 +52,111 @@ class PittyAudioService {
     }
   }
 
-  Future<void> loadTracks() async {
-    if (_tracksLoaded) return;
-    _tracks = kAlbums.first.tracks;
+  Future<T> _emSerie<T>(Future<T> Function() op) async {
+    final completer = Completer<T>();
+    _opQueue.add(() async {
+      try {
+        final resultado = await op();
+        completer.complete(resultado);
+      } catch (e) {
+        completer.completeError(e);
+      }
+      return;
+    });
+    _processarFila();
+    return completer.future;
+  }
 
-    // Initialize lock screen handler with playlist
-    await _audioHandler.initializePlaylist(_tracks);
+  void _processarFila() {
+    if (_emExecucao || _opQueue.isEmpty) return;
+    _emExecucao = true;
+    _executarProxima();
+  }
 
-    if (_tracks.isNotEmpty && _currentTrack == null) {
-      _currentTrack = _tracks.first;
+  void _executarProxima() {
+    if (_opQueue.isEmpty) {
+      _emExecucao = false;
+      return;
     }
-    _tracksLoaded = true;
+    final op = _opQueue.removeAt(0);
+    op().whenComplete(_executarProxima);
+  }
+
+  void _tocar() {
+    _player.play().catchError((e) {
+      print('✗ Erro ao tocar: $e');
+    });
+  }
+
+  Future<void> loadTracks() async {
+    _cargaInicial ??= _emSerie<void>(() async {
+      if (_tracksLoaded) return;
+      _tracks = kAlbums.first.tracks;
+      _currentAlbum = kAlbums.first;
+
+      await _audioHandler.initializePlaylist(_tracks);
+
+      if (_tracks.isNotEmpty) {
+        currentTrackNotifier.value = _tracks.first;
+      }
+      _tracksLoaded = true;
+      print('✓ Faixas iniciais carregadas');
+    });
+    return _cargaInicial;
   }
 
   Future<void> loadAlbum(Album album) async {
-    _tracks = album.tracks;
-    _currentTrack = null;
+    return _emSerie<void>(() async {
+      _tracks = album.tracks;
+      _currentAlbum = album;
+      await _audioHandler.initializePlaylist(_tracks, initialIndex: 0);
+      currentAlbumNotifier.value = album;
+      if (_tracks.isNotEmpty) {
+        currentTrackNotifier.value = _tracks.first;
+      }
+      print('✓ Álbum carregado: ${album.title} (${_tracks.length} faixas)');
+    });
+  }
 
-    await _audioHandler.initializePlaylist(_tracks);
+  Future<void> playAlbum(Album album, {int startIndex = 0}) async {
+    return _emSerie<void>(() async {
+      final jaMesmoAlbum = _currentAlbum == album;
 
-    if (_tracks.isNotEmpty) {
-      _currentTrack = _tracks.first;
-    }
+      if (jaMesmoAlbum && _player.playing) {
+        print('✓ Álbum já está tocando');
+        return;
+      }
+
+      await _player.pause();
+      _tracks = album.tracks;
+      _currentAlbum = album;
+      await _audioHandler.initializePlaylist(_tracks, initialIndex: startIndex);
+      currentAlbumNotifier.value = album;
+
+      if (_tracks.isNotEmpty) {
+        currentTrackNotifier.value = _tracks[startIndex];
+        _tocar();
+        print('→ Tocando: ${_tracks[startIndex].title}');
+      }
+    });
   }
 
   Future<void> play(Track track) async {
-    try {
-      _currentTrack = track;
-      print('→ Playing: ${track.title}');
-      print('  - Artist: Mary\'s Secret Box');
-
-      final trackIndex = _tracks.indexOf(track);
-      if (trackIndex != -1) {
-        await _player.seek(Duration.zero, index: trackIndex);
-      }
-
-      await _player.play();
-      print('✓ Audio started playing');
-
-      _setupRepeatListener();
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  void _setupRepeatListener() {
-    _repeatListener?.cancel();
-    _repeatListener = _player.playerStateStream.listen((state) async {
-      if (state.processingState == ProcessingState.completed && _currentTrack != null) {
-        if (_repeatMode == 1) {
-          await _player.seek(Duration.zero);
-          await _player.play();
-        } else if (_repeatMode == 2) {
-          final currentIndex = _tracks.indexOf(_currentTrack!);
-          if (currentIndex != -1 && currentIndex < _tracks.length - 1) {
-            await play(_tracks[currentIndex + 1]);
-          } else if (currentIndex == _tracks.length - 1) {
-            await play(_tracks.first);
-          }
+    return _emSerie<void>(() async {
+      try {
+        final trackIndex = _tracks.indexOf(track);
+        if (trackIndex == -1) {
+          print('✗ Faixa não encontrada: ${track.title}');
+          return;
         }
+
+        await _player.seek(Duration.zero, index: trackIndex);
+        currentTrackNotifier.value = track;
+        _tocar();
+        print('→ Tocando: ${track.title}');
+      } catch (e) {
+        print('✗ Erro ao tocar faixa: $e');
+        rethrow;
       }
     });
   }
@@ -100,7 +166,7 @@ class PittyAudioService {
   }
 
   Future<void> resume() async {
-    await _player.play();
+    _tocar();
   }
 
   Future<void> seekTo(Duration position) async {
@@ -108,45 +174,43 @@ class PittyAudioService {
   }
 
   Future<void> next() async {
-    if (_currentTrack == null) return;
-    if (_shuffleMode && _tracks.isNotEmpty) {
+    if (_tracks.isEmpty) return;
+
+    if (_shuffleMode) {
       final randomIndex = _random.nextInt(_tracks.length);
       await play(_tracks[randomIndex]);
-    } else {
-      final currentIndex = _tracks.indexOf(_currentTrack!);
-      if (currentIndex != -1 && currentIndex < _tracks.length - 1) {
-        await play(_tracks[currentIndex + 1]);
-      } else if (currentIndex == _tracks.length - 1 && _repeatMode == 2) {
-        await play(_tracks.first);
-      }
+    } else if (_player.hasNext) {
+      await _player.seekToNext();
     }
   }
 
   Future<void> previous() async {
-    if (_currentTrack == null) return;
-    final currentIndex = _tracks.indexOf(_currentTrack!);
-    if (currentIndex > 0) {
-      await play(_tracks[currentIndex - 1]);
+    if (_tracks.isEmpty) return;
+
+    if (_player.hasPrevious) {
+      await _player.seekToPrevious();
     }
   }
 
   AudioPlayer get player => _player;
   List<Track> get tracks => _tracks;
-  Track? get currentTrack => _currentTrack;
+  Track? get currentTrack => currentTrackNotifier.value;
+  Album? get currentAlbum => _currentAlbum;
   int get repeatMode => _repeatMode;
   bool get shuffleMode => _shuffleMode;
 
   void toggleRepeatMode() {
     _repeatMode = (_repeatMode + 1) % 3;
-    _setupRepeatListener();
+    _player.setLoopMode(
+      _repeatMode == 0 ? LoopMode.off :
+      _repeatMode == 1 ? LoopMode.one :
+      LoopMode.all
+    );
   }
 
   void toggleShuffle() {
     _shuffleMode = !_shuffleMode;
-    if (_shuffleMode && _tracks.isNotEmpty) {
-      final randomIndex = _random.nextInt(_tracks.length);
-      play(_tracks[randomIndex]);
-    }
+    _player.setShuffleModeEnabled(_shuffleMode);
   }
 
   bool isLiked(Track track) => _likedTracks.contains(track.path);
@@ -160,7 +224,9 @@ class PittyAudioService {
   }
 
   void dispose() {
-    _repeatListener?.cancel();
+    _currentIndexSubscription?.cancel();
+    currentTrackNotifier.dispose();
+    currentAlbumNotifier.dispose();
     _player.dispose();
   }
 }
