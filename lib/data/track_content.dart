@@ -271,6 +271,12 @@ const kConteudoAlbuns = <String, ConteudoFaixa>{
     clipeLabel: 'CLIPE OFICIAL',
     clipeTitulo: 'Beyond Smoke',
   ),
+  'escravos-do-tempo': ConteudoFaixa(
+    letra: _letraExemplo,
+    clipeYoutubeId: 'vaFN2K1BJqs',
+    clipeLabel: 'CLIPE OFICIAL',
+    clipeTitulo: 'Escravos do Tempo Continuo e Lento',
+  ),
 };
 
 ConteudoFaixa conteudoDoAlbum(String? albumId) =>
