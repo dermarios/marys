@@ -35,7 +35,7 @@ class PlayerShell extends StatelessWidget {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: MediaQuery.of(context).padding.bottom + 8 + 64 - 8,
+                bottom: MediaQuery.of(context).padding.bottom + 72,
                 child: Center(
                   child: BotaoExpandir(
                     onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
@@ -79,7 +79,10 @@ class MiniPlayer extends StatelessWidget {
         ]),
         builder: (context, _) {
           final track = audioService.currentTrack;
-          if (track == null || audioService.playerExpandedNotifier.value) {
+          if (track == null) {
+            return const SizedBox.shrink();
+          }
+          if (audioService.playerExpandedNotifier.value) {
             return const SizedBox.shrink();
           }
           return StreamBuilder<PlayerState>(
@@ -205,11 +208,15 @@ class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    print('🔵 BotaoExpandir está sendo renderizado');
     return Semantics(
       button: true,
       label: 'Expandir player',
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () {
+          print('🔴 BotaoExpandir foi tocado');
+          widget.onTap();
+        },
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.all(8),
