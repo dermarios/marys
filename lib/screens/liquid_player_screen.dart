@@ -268,7 +268,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   else ...[
                     ClipeCard(conteudo: conteudoDoAlbum(widget.audioService.currentAlbum?.id), titulo: track?.title ?? ''),
                     const SizedBox(height: 24),
-                    for (final a in kAlbuns) ...[
+                    for (final a in albumnsRelacionadosDo(widget.audioService.currentAlbum?.id)) ...[
                       AlbumSpotifyCard(album: a),
                       const SizedBox(height: 10),
                     ],

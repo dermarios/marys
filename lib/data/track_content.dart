@@ -71,6 +71,28 @@ const kAlbuns = <AlbumSpotify>[
   AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
 ];
 
+/// Cards de álbuns relacionados por álbum. Configurável pelo desenvolvedor.
+const kAlbunsRelacionados = <String, List<AlbumSpotify>>{
+  'just': <AlbumSpotify>[
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+  ],
+  'beyond-smoke': <AlbumSpotify>[
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+  ],
+  'escravos-do-tempo': <AlbumSpotify>[
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+  ],
+};
+
+List<AlbumSpotify> albumnsRelacionadosDo(String? albumId) =>
+    (albumId == null ? null : kAlbunsRelacionados[albumId.toLowerCase()]) ?? kAlbuns;
+
 class VideoFa {
   final String titulo, usuario, duracao, url;
   const VideoFa(this.titulo, this.usuario, this.duracao, this.url);
