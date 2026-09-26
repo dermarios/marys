@@ -152,7 +152,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           fontSize: 9, letterSpacing: 3, color: Colors.white.withOpacity(0.7))),
                   const SizedBox(height: 10),
                   const Text(
-                    'Pitty',
+                    'Mary\'s Secret Box',
                     style: TextStyle(
                       fontSize: 62,
                       height: 0.92,

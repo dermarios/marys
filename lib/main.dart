@@ -17,7 +17,7 @@ void main() async {
     builder: () => LockScreenAudioHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.forven.pittyplayer.channel.audio',
-      androidNotificationChannelName: 'Pitty Player',
+      androidNotificationChannelName: 'Mary\'s Secret Box',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
     final audioService = pitty_audio.PittyAudioService(audioHandler);
 
     return MaterialApp(
-      title: 'Pitty Player',
+      title: 'Mary\'s Secret Box',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,

@@ -79,8 +79,8 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
           MediaItem(
             id: track.path,
             title: track.title,
-            artist: 'Pitty',
-            album: 'Pitty Player',
+            artist: 'Mary\'s Secret Box',
+            album: 'Mary\'s Secret Box',
             duration: track.duration,
             artUri: _artworkPath != null ? Uri.file(_artworkPath!) : null,
           ),

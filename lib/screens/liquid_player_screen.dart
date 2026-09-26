@@ -281,7 +281,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   style: TextStyle(
                       fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.55))),
               const SizedBox(height: 3),
-              const Text('Forven · Pitty',
+              const Text('Mary\'s Secret Box',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
@@ -382,7 +382,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     fontSize: 25, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: Colors.white),
               ),
               const SizedBox(height: 4),
-              Text('Pitty', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
+              Text('Mary\'s Secret Box', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
             ],
           ),
         ),
@@ -605,7 +605,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white.withOpacity(atual ? 1 : 0.88))),
-                                Text('Pitty',
+                                Text('Mary\'s Secret Box',
                                     style: TextStyle(
                                         fontSize: 11, color: Colors.white.withOpacity(0.6))),
                               ],

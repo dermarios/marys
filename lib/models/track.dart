@@ -17,9 +17,9 @@ class Track {
   MediaItem toMediaItem() {
     return MediaItem(
       id: path,
-      album: 'Pitty Player',
+      album: 'Mary\'s Secret Box',
       title: title,
-      artist: 'Pitty',
+      artist: 'Mary\'s Secret Box',
       duration: duration,
       // Note: artwork será gerenciado pelo BackgroundAudioHandler
       // que copia o asset para diretório temporário

@@ -78,7 +78,7 @@ class PittyAudioService {
     try {
       _currentTrack = track;
       print('→ Playing: ${track.title}');
-      print('  - Artist: Pitty');
+      print('  - Artist: Mary\'s Secret Box');
 
       final trackIndex = _tracks.indexOf(track);
       if (trackIndex != -1) {
