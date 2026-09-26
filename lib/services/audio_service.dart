@@ -18,6 +18,7 @@ class PittyAudioService {
   Set<String> _likedTracks = {};
   final _random = math.Random();
   Future<void>? _cargaInicial;
+  int _trocasPendentes = 0;
 
   StreamSubscription<int?>? _currentIndexSubscription;
 
@@ -37,10 +38,21 @@ class PittyAudioService {
 
   void _setupCurrentTrackListener() {
     _currentIndexSubscription = _player.currentIndexStream.listen((index) {
+      if (_trocasPendentes > 0) return;
       if (index != null && index < _tracks.length) {
         currentTrackNotifier.value = _tracks[index];
       }
     });
+  }
+
+  void _publicarEstadoReal() {
+    if (_currentAlbum != null) {
+      currentAlbumNotifier.value = _currentAlbum;
+    }
+    final index = _player.currentIndex ?? 0;
+    if (index >= 0 && index < _tracks.length) {
+      currentTrackNotifier.value = _tracks[index];
+    }
   }
 
   Future<void> _initializeAudioSession() async {
@@ -99,6 +111,7 @@ class PittyAudioService {
       if (_tracks.isNotEmpty) {
         currentTrackNotifier.value = _tracks.first;
       }
+      currentAlbumNotifier.value = kAlbums.first;
       _tracksLoaded = true;
       print('✓ Faixas iniciais carregadas');
     });
@@ -119,24 +132,44 @@ class PittyAudioService {
   }
 
   Future<void> playAlbum(Album album, {int startIndex = 0}) async {
-    return _emSerie<void>(() async {
-      final jaMesmoAlbum = _currentAlbum == album;
+    if (album.tracks.isEmpty) return Future.value();
 
-      if (jaMesmoAlbum && _player.playing) {
-        print('✓ Álbum já está tocando');
-        return;
-      }
-
-      await _player.pause();
-      _tracks = album.tracks;
-      _currentAlbum = album;
-      await _audioHandler.initializePlaylist(_tracks, initialIndex: startIndex);
+    if (!identical(_currentAlbum, album)) {
       currentAlbumNotifier.value = album;
+      if (album.tracks.isNotEmpty && startIndex < album.tracks.length) {
+        currentTrackNotifier.value = album.tracks[startIndex];
+      }
+    }
 
-      if (_tracks.isNotEmpty) {
-        currentTrackNotifier.value = _tracks[startIndex];
-        _tocar();
-        print('→ Tocando: ${_tracks[startIndex].title}');
+    return _emSerie<void>(() async {
+      _trocasPendentes++;
+      try {
+        final mesmoAlbum = identical(_currentAlbum, album);
+
+        if (mesmoAlbum) {
+          if (!_player.playing) {
+            _tocar();
+            print('→ Retomando álbum pausado');
+          } else {
+            print('✓ Álbum já está tocando');
+          }
+          return;
+        }
+
+        await _player.pause();
+        _tracks = album.tracks;
+        _currentAlbum = album;
+        await _audioHandler.initializePlaylist(_tracks, initialIndex: startIndex);
+
+        if (_tracks.isNotEmpty) {
+          _tocar();
+          print('→ Tocando: ${_tracks[startIndex].title}');
+        }
+      } finally {
+        _trocasPendentes--;
+        if (_trocasPendentes == 0) {
+          _publicarEstadoReal();
+        }
       }
     });
   }

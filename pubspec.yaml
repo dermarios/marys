@@ -50,6 +50,9 @@ flutter:
     - assets/capa-fundo.png
     - assets/a4167869092_1x1_700.avif
     - assets/33898823_1876726852378352_5577473749248114688_n.jpg
+    - assets/Spotify_Primary_Logo_RGB_Green.png
+    - assets/Apple_Music_icon.svg.webp
+    - assets/deezer-rounded-logo-design-free-png.webp
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -78,7 +81,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 flutter_launcher_icons:
-  image_path: "assets/jorge-daux-icon.webp"
+  image_path: "assets/app-icon.jpeg"
   ios: true
-  image_path_ios: "assets/jorge-daux-icon.webp"
+  image_path_ios: "assets/app-icon.jpeg"
   remove_alpha_ios: true

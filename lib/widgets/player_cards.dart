@@ -80,7 +80,10 @@ class LetraCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final letra = conteudoDe(audioService.currentTrack).letra;
+    return ListenableBuilder(
+      listenable: audioService.currentTrackNotifier,
+      builder: (context, _) {
+        final letra = conteudoDe(audioService.currentTrack).letra;
     return CardVidro(
       titulo: 'Letra',
       acao: GestureDetector(
@@ -133,6 +136,8 @@ class LetraCard extends StatelessWidget {
         },
       ),
     );
+      },
+    );
   }
 }
 
@@ -152,22 +157,23 @@ class ClipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final id = conteudo.clipeYoutubeId;
+    if (id == null) return const SizedBox.shrink();
+
     return CardVidro(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onTap: id == null ? null : () => abrirLink('https://www.youtube.com/watch?v=$id'),
+            onTap: () => abrirLink('https://www.youtube.com/watch?v=$id'),
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Container(color: Colors.black),
-                  if (id != null)
-                    Image.network('https://img.youtube.com/vi/$id/hqdefault.jpg',
-                        fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
+                  Image.network('https://img.youtube.com/vi/$id/hqdefault.jpg',
+                      fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -200,11 +206,11 @@ class ClipeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('CLIPE OFICIAL',
+                Text(conteudo.clipeLabel,
                     style: TextStyle(
                         fontSize: 9, letterSpacing: 1.8, color: Colors.white.withOpacity(0.6))),
                 const SizedBox(height: 4),
-                Text(titulo,
+                Text(conteudo.clipeTitulo ?? titulo,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -223,27 +229,68 @@ class AlbumSpotifyCard extends StatelessWidget {
   final AlbumSpotify album;
   const AlbumSpotifyCard({super.key, required this.album});
 
+  Map<String, dynamic> _infoServico() {
+    switch (album.servico) {
+      case ServicoStreaming.spotify:
+        return {
+          'nome': 'Spotify',
+          'logo': 'assets/Spotify_Primary_Logo_RGB_Green.png',
+          'cor': const Color(0xFF1ED760),
+          'tinta': Colors.black,
+          'subtitulo': 'Abrir álbum no Spotify',
+          'acao': () => abrirSpotifyAlbum(album.spotifyId),
+        };
+      case ServicoStreaming.appleMusic:
+        return {
+          'nome': 'Apple Music',
+          'logo': 'assets/Apple_Music_icon.svg.webp',
+          'cor': const Color(0xFFFA2D48),
+          'tinta': Colors.white,
+          'subtitulo': 'Abrir álbum no Apple Music',
+          'acao': () => abrirLink(linkAppleMusicAlbum(album.spotifyId)),
+        };
+      case ServicoStreaming.deezer:
+        return {
+          'nome': 'Deezer',
+          'logo': 'assets/deezer-rounded-logo-design-free-png.webp',
+          'cor': const Color(0xFFA238FF),
+          'tinta': Colors.white,
+          'subtitulo': 'Abrir álbum no Deezer',
+          'acao': () => abrirLink(linkDeezerAlbum(album.spotifyId)),
+        };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final info = _infoServico();
     return GestureDetector(
-      onTap: () => abrirSpotifyAlbum(album.spotifyId),
+      onTap: info['acao'] as VoidCallback,
       child: _LinhaServico(
         leading: Container(
           width: 52,
           height: 52,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(13),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: kPaletas[album.paleta % kPaletas.length],
+            color: (info['cor'] as Color).withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Image.asset(
+            info['logo'] as String,
+            width: 32,
+            height: 32,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Icon(
+              Icons.music_note_rounded,
+              size: 24,
+              color: info['cor'] as Color,
             ),
           ),
         ),
         titulo: album.nome,
-        subtitulo: 'Abrir álbum no Spotify',
-        cor: const Color(0xFF1ED760),
-        tinta: Colors.black,
+        subtitulo: info['subtitulo'] as String,
+        cor: info['cor'] as Color,
+        tinta: info['tinta'] as Color,
       ),
     );
   }
@@ -324,7 +371,7 @@ class SobreArtistaCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Pitty',
+                  const Text('Mary\'s Secret Box',
                       style: TextStyle(
                           fontSize: 24, fontStyle: FontStyle.italic, color: Colors.white)),
                   const SizedBox(height: 4),

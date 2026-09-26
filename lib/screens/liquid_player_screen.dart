@@ -8,6 +8,7 @@ import 'package:msb_just/data/track_content.dart';
 import 'package:msb_just/models/track.dart';
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/widgets/player_cards.dart';
+import 'package:msb_just/widgets/mini_player.dart';
 
 /// Tela "Tocando agora" — conceito Liquid Glass.
 /// Drop-in: no main.dart use
@@ -77,26 +78,7 @@ class Glass extends StatelessWidget {
               ),
             ],
           ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 1,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      Colors.white.withOpacity(0),
-                      Colors.white.withOpacity(g.sheen),
-                      Colors.white.withOpacity(0),
-                    ]),
-                  ),
-                ),
-              ),
-              child,
-            ],
-          ),
+          child: child,
         ),
       ),
     );
@@ -232,16 +214,30 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   List<Color> get _paleta {
     final t = widget.audioService.currentTrack;
-    final i = t == null ? 0 : widget.audioService.tracks.indexOf(t);
+    final i = t == null ? 0 : _faixas.indexOf(t);
     return kPaletas[(i < 0 ? 0 : i) % kPaletas.length];
   }
 
   String _fmt(Duration d) => '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 
+  List<Track> get _faixas =>
+      widget.audioService.currentAlbumNotifier.value?.tracks ??
+      widget.audioService.tracks;
+
   @override
   Widget build(BuildContext context) {
-    final track = widget.audioService.currentTrack;
+    final s = widget.audioService;
+    return ListenableBuilder(
+      listenable:
+          Listenable.merge([s.currentTrackNotifier, s.currentAlbumNotifier]),
+      builder: (context, _) {
+        final track = s.currentTrack;
+        return _buildPlayer(track);
+      },
+    );
+  }
 
+  Widget _buildPlayer(Track? track) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0910),
       body: Stack(
@@ -266,13 +262,13 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   _controles(),
                   const SizedBox(height: 16),
                   _listaFaixas(),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 24),
                   if (widget.expandido)
                     ...cardsPlayerExpandido(context, widget.audioService)
                   else ...[
-                    ClipeCard(conteudo: conteudoDe(track), titulo: track?.title ?? ''),
-                    const SizedBox(height: 12),
-                    for (final a in kAlbuns) ...[
+                    ClipeCard(conteudo: conteudoDoAlbum(widget.audioService.currentAlbum?.id), titulo: track?.title ?? ''),
+                    const SizedBox(height: 24),
+                    for (final a in albumnsRelacionadosDo(widget.audioService.currentAlbum?.id)) ...[
                       AlbumSpotifyCard(album: a),
                       const SizedBox(height: 10),
                     ],
@@ -281,6 +277,12 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
               ),
             ),
           ),
+          Positioned(
+            left: 10,
+            right: 10,
+            bottom: MediaQuery.of(context).padding.bottom + 8,
+            child: MiniPlayer(audioService: widget.audioService),
+          ),
         ],
       ),
     );
@@ -288,6 +290,9 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── topo ───────────────────────────────────────────────────────────
   Widget _barraTopo() {
+    final album = widget.audioService.currentAlbumNotifier.value;
+    final albumTitle = album?.title.replaceAll('\n', ' ') ?? 'Forven · Mary\'s Secret Box';
+
     return Row(
       children: [
         _iconeVidro(Icons.keyboard_arrow_down_rounded, () => Navigator.of(context).maybePop()),
@@ -298,10 +303,10 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   style: TextStyle(
                       fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.55))),
               const SizedBox(height: 3),
-              const Text('Forven · Pitty',
+              Text(albumTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
+                  style: const TextStyle(fontSize: 14, color: Colors.white)),
             ],
           ),
         ),
@@ -356,7 +361,8 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
               fit: StackFit.expand,
               children: [
                 Image.asset(
-                  track?.imageAsset ?? 'assets/Jorge-Daux-@jorgedaux.webp',
+                  track?.imageAsset ?? 'assets/albuns/just/Jorge-Daux-@jorgedaux.webp',
+                  key: ValueKey(track?.imageAsset),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(color: Colors.white10),
                 ),
@@ -399,7 +405,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     fontSize: 25, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: Colors.white),
               ),
               const SizedBox(height: 4),
-              Text('Pitty', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
+              Text('Mary\'s Secret Box', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
             ],
           ),
         ),
@@ -530,68 +536,62 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── lista de faixas numerada (no lugar da letra/fila) ──────────────
   Widget _listaFaixas() {
-    final todas = widget.audioService.tracks;
+    final todas = _faixas;
     final tracks = widget.expandido
         ? todas.where((t) => t == widget.audioService.currentTrack).toList()
         : todas;
-    return Glass(
-      mode: _mode,
-      radius: 24,
-      child: tracks.isEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)))
-          : Builder(
-              // sem rolagem própria: a altura acompanha a quantidade de faixas
-              builder: (_) => ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                itemCount: tracks.length,
-                itemBuilder: (_, i) {
-                  final t = tracks[i];
-                  final atual = t == widget.audioService.currentTrack;
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      widget.audioService.play(t);
-                      if (mounted) setState(() {});
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 1),
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: atual ? Colors.white.withOpacity(0.12) : Colors.transparent,
-                      ),
+    if (tracks.isEmpty) {
+      return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
+              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)));
+    }
+
+    // Calcula duração total
+    final durTotal = tracks.fold<Duration>(Duration.zero, (prev, t) => prev + t.duration);
+    final minutos = durTotal.inMinutes;
+
+    return Column(
+      children: [
+        Builder(
+          // sem rolagem própria: a altura acompanha a quantidade de faixas
+          builder: (_) => ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            itemCount: tracks.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (_, i) {
+              final t = tracks[i];
+              final atual = t == widget.audioService.currentTrack;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  widget.audioService.play(t);
+                },
+                child: Stack(
+                  children: [
+                    Glass(
+                      mode: _mode,
+                      radius: 20,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 19,
-                            child: Text(
-                              (todas.indexOf(t) + 1).toString().padLeft(2, '0'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(atual ? 1 : 0.5)),
-                            ),
+                            width: 20,
+                            child: atual
+                                ? Icon(Icons.music_note_rounded,
+                                    size: 16, color: Colors.white.withOpacity(0.9))
+                                : Text(
+                                    (todas.indexOf(t) + 1).toString(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.55)),
+                                  ),
                           ),
-                          const SizedBox(width: 11),
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: kPaletas[i % kPaletas.length].take(2).toList(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 11),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -599,30 +599,74 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                                 Text(t.title,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 13,
+                                    style: const TextStyle(
+                                        fontSize: 14.5,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.white.withOpacity(atual ? 1 : 0.88))),
-                                Text('Pitty',
+                                        color: Colors.white)),
+                                Text('Mary\'s Secret Box',
                                     style: TextStyle(
-                                        fontSize: 11, color: Colors.white.withOpacity(0.6))),
+                                        fontSize: 11, color: Colors.white.withOpacity(0.62))),
                               ],
                             ),
                           ),
-                          Text(
-                            t.duration == Duration.zero ? '' : _fmt(t.duration),
-                            style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.55)),
+                          SizedBox(
+                            width: 50,
+                            child: Text(
+                              t.duration == Duration.zero ? '' : _fmt(t.duration),
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.58)),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
+                    // faixa atual: contorno claro por cima do vidro
+                    if (atual)
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white.withOpacity(0.5)),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total de ${tracks.length} músicas - $minutos minutos',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.65),
+                ),
               ),
-            ),
+              Text(
+                '©2016 Mary\'s Secret Box',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.65),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
