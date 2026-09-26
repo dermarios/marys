@@ -4,23 +4,18 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import '../services/audio_service.dart' as pitty_audio;
-import 'liquid_player_screen.dart' show Glass, GlassMode, kPaletas;
+import 'package:msb_just/services/audio_service.dart';
+import 'package:msb_just/models/album.dart';
+import 'package:msb_just/widgets/mini_player.dart';
+import 'liquid_player_screen.dart';
+import 'library_screen.dart';
 
 /// Tela "Artista" — evolução da SideScreen: a foto sangra na tela inteira e os
 /// blobs líquidos entram POR CIMA dela em blend soft-light / screen, então a
 /// cor se funde à imagem em vez de ficar atrás.
 class ArtistScreen extends StatefulWidget {
-  final pitty_audio.PittyAudioService audioService;
-  final VoidCallback? onBackPressed;
-  final VoidCallback? onPlayPressed;
-
-  const ArtistScreen({
-    super.key,
-    required this.audioService,
-    this.onBackPressed,
-    this.onPlayPressed,
-  });
+  final AudioService audioService;
+  const ArtistScreen({super.key, required this.audioService});
 
   @override
   State<ArtistScreen> createState() => _ArtistScreenState();
@@ -31,14 +26,26 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   final GlassMode _mode = GlassMode.fosco;
   bool _curtido = false;
 
-  static const _foto = 'assets/capa-fundo.png';
+  static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
 
-  /// Agenda — substitua pelos shows reais.
-  static const _shows = [
-    (dia: '12', mes: 'SET', cidade: 'Salvador', casa: 'Concha Acústica', status: 'INGRESSOS'),
-    (dia: '19', mes: 'SET', cidade: 'São Paulo', casa: 'Audio', status: 'ESGOTADO'),
-    (dia: '04', mes: 'OUT', cidade: 'Belo Horizonte', casa: 'Mineirinho', status: 'INGRESSOS'),
-    (dia: '18', mes: 'OUT', cidade: 'Porto Alegre', casa: 'Opinião', status: 'INGRESSOS'),
+  /// Discografia — confira títulos/anos antes de publicar.
+  static const _disco = [
+    (titulo: 'Admirável Chip Novo', ano: '2003', tipo: 'Álbum'),
+    (titulo: 'Anacrônico', ano: '2005', tipo: 'Álbum'),
+    (titulo: '{Des}Concerto Ao Vivo', ano: '2007', tipo: 'Ao vivo'),
+    (titulo: 'Chiaroscuro', ano: '2009', tipo: 'Álbum'),
+    (titulo: 'SETEVIDAS', ano: '2014', tipo: 'Álbum'),
+    (titulo: 'Matriz', ano: '2019', tipo: 'Álbum'),
+  ];
+
+  /// Mais tocadas — valores de exemplo. Se o título existir em tracks.json,
+  /// o toque toca a faixa local.
+  static const _top = [
+    (titulo: 'Máscara', plays: '2,4 mi', dur: '4:03'),
+    (titulo: 'Equalize', plays: '1,9 mi', dur: '4:44'),
+    (titulo: 'Teto de Vidro', plays: '1,3 mi', dur: '3:52'),
+    (titulo: 'Na Sua Estante', plays: '980 mil', dur: '4:12'),
+    (titulo: 'Memórias', plays: '720 mil', dur: '3:41'),
   ];
 
   @override
@@ -54,6 +61,25 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   void dispose() {
     _blobs.dispose();
     super.dispose();
+  }
+
+  void _abrirPlayer() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: true),
+      ),
+    );
+  }
+
+  Future<void> _carregarAlbum(Album album) async {
+    await widget.audioService.loadAlbum(album);
+    if (album.tracks.isNotEmpty) {
+      await widget.audioService.play(album.tracks.first);
+    }
+    if (mounted) {
+      setState(() {});
+      _abrirPlayer();
+    }
   }
 
   @override
@@ -97,14 +123,29 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
           ),
           // 5 · conteúdo
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+            bottom: false,
+            child: SingleChildScrollView(
+              // o conteúdo rola por cima da foto fixa; 120 px para o player flutuante
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: Glass(
+                          mode: _mode,
+                          radius: 19,
+                          child: SizedBox(
+                            width: 38,
+                            height: 38,
+                            child: Icon(Icons.chevron_left_rounded,
+                                size: 22, color: Colors.white.withOpacity(0.9)),
+                          ),
+                        ),
+                      ),
                       Glass(
                         mode: _mode,
                         radius: 16,
@@ -131,32 +172,19 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: widget.onBackPressed ?? () => Navigator.of(context).pop(),
-                        child: Glass(
-                          mode: _mode,
-                          radius: 19,
-                          child: SizedBox(
-                            width: 38,
-                            height: 38,
-                            child: Icon(Icons.chevron_right_rounded,
-                                size: 22, color: Colors.white.withOpacity(0.9)),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                  const Spacer(),
-                  Text('ARTISTA',
+                  const SizedBox(height: 300),
+                  Text('LANÇAMENTO',
                       style: TextStyle(
                           fontSize: 9, letterSpacing: 3, color: Colors.white.withOpacity(0.7))),
                   const SizedBox(height: 10),
                   const Text(
-                    'Mary\'s Secret Box',
+                    'Beyond Smoke',
                     style: TextStyle(
                       fontSize: 62,
                       height: 0.92,
-                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                       shadows: [Shadow(color: Colors.black54, blurRadius: 40, offset: Offset(0, 8))],
                     ),
@@ -165,9 +193,12 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   SizedBox(
                     width: 300,
                     child: Text(
-                      'Rock brasileiro de Salvador. $n faixas na sua coleção, três álbuns e um EP ao vivo.',
+                      'Mary\'s Secret Box - Beyond Smoke (single) Jul. de 2018',
                       style: TextStyle(
-                          fontSize: 13.5, height: 1.55, color: Colors.white.withOpacity(0.78)),
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w300,
+                          height: 1.55,
+                          color: Colors.white.withOpacity(0.78)),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -180,7 +211,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                 ? widget.audioService.tracks.first
                                 : null;
                             if (t != null) await widget.audioService.play(t);
-                            if (mounted) widget.onPlayPressed?.call();
+                            if (mounted) _abrirPlayer();
                           },
                           child: Glass(
                             mode: _mode,
@@ -204,115 +235,87 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                         ),
                       ),
                       const SizedBox(width: 10),
+                      _botaoVidro(Icons.shuffle_rounded, () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => LibraryScreen(audioService: widget.audioService),
+                        ));
+                      }),
+                      const SizedBox(width: 10),
                       _botaoVidro(
-                        Icons.share_rounded,
-                        () {
-                          // Compartilhar artista
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Compartilhe com seus amigos! 🎵')),
-                          );
-                        },
+                        _curtido ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                        () => setState(() => _curtido = !_curtido),
                       ),
                     ],
                   ),
                   const SizedBox(height: 22),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text('Próximos shows',
-                          style: TextStyle(
-                              fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white)),
-                      Text('${_shows.length} DATAS',
-                          style: TextStyle(
-                              fontSize: 10,
-                              letterSpacing: 1.6,
-                              color: Colors.white.withOpacity(0.62))),
-                    ],
-                  ),
+                  _cabecalho('Discografia', '${kAlbums.length} LANÇAMENTOS'),
                   const SizedBox(height: 11),
                   SizedBox(
-                    height: 148,
+                    height: 210,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _shows.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      clipBehavior: Clip.none,
+                      itemCount: kAlbums.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
                       itemBuilder: (_, i) {
-                        final show = _shows[i];
-                        final esgotado = show.status == 'ESGOTADO';
+                        final album = kAlbums[i];
                         return GestureDetector(
-                          onTap: () {},
-                          child: Glass(
-                            mode: _mode,
-                            radius: 20,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-                            child: SizedBox(
-                              width: 162,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                                    textBaseline: TextBaseline.alphabetic,
-                                    children: [
-                                      Text(show.dia,
-                                          style: const TextStyle(
-                                              fontSize: 26,
-                                              height: 1,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: -1,
-                                              color: Colors.white)),
-                                      const SizedBox(width: 6),
-                                      Text(show.mes,
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1.4,
-                                              color: Colors.white.withOpacity(0.72))),
-                                    ],
+                          onTap: () async {
+                            await _carregarAlbum(album);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 140,
+                                height: 140,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  image: DecorationImage(
+                                    image: AssetImage(album.coverAsset),
+                                    fit: BoxFit.cover,
                                   ),
-                                  const SizedBox(height: 9),
-                                  Text(show.cidade,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white)),
-                                  Text(show.casa,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontSize: 11, color: Colors.white.withOpacity(0.68))),
-                                  const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(color: Colors.white.withOpacity(0.12)),
-                                      ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.4),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(show.status,
-                                            style: TextStyle(
-                                                fontSize: 10.5,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 1,
-                                                color: Colors.white
-                                                    .withOpacity(esgotado ? 0.6 : 1))),
-                                        Icon(Icons.chevron_right_rounded,
-                                            size: 15, color: Colors.white.withOpacity(0.65)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: 140,
+                                child: Text(
+                                  album.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _cabecalho('Mais tocadas', 'ESTE MÊS'),
+                  const SizedBox(height: 11),
+                  Glass(
+                    mode: _mode,
+                    radius: 24,
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < _top.length; i++) _linhaTop(i),
+                      ],
                     ),
                   ),
                 ],
@@ -320,6 +323,92 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _cabecalho(String titulo, String meta) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(titulo,
+              style: const TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white)),
+          Text(meta,
+              style: TextStyle(
+                  fontSize: 10, letterSpacing: 1.6, color: Colors.white.withOpacity(0.62))),
+        ],
+      );
+
+  /// Toca a faixa local cujo título (ou álbum) bate; senão não faz nada.
+  Future<void> _tocarPorTitulo(String titulo, {bool album = false}) async {
+    final s = widget.audioService;
+    final alvo = s.tracks.where((t) => t.title.toLowerCase() == titulo.toLowerCase());
+    if (alvo.isEmpty) return;
+    await s.play(alvo.first);
+    if (!mounted) return;
+    setState(() {});
+    if (album) _abrirPlayer();
+  }
+
+  Widget _linhaTop(int i) {
+    final t = _top[i];
+    final atual = widget.audioService.currentTrack?.title.toLowerCase() == t.titulo.toLowerCase();
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _tocarPorTitulo(t.titulo),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: atual ? Colors.white.withOpacity(0.12) : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 19,
+              child: Text('${i + 1}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(atual ? 1 : 0.55))),
+            ),
+            const SizedBox(width: 11),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(11),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: kPaletas[i % kPaletas.length].take(2).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.titulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                  Text('${t.plays} reproduções',
+                      style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.62))),
+                ],
+              ),
+            ),
+            Text(t.dur,
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.58))),
+          ],
+        ),
       ),
     );
   }
@@ -395,24 +484,22 @@ class BlendMask extends SingleChildRenderObjectWidget {
   const BlendMask({super.key, required this.blendMode, super.child});
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderBlendMask(blendMode);
+  RenderObject createRenderObject(BuildContext context) => _RenderBlendMask(blendMode) as RenderObject;
 
   @override
-  void updateRenderObject(BuildContext context, _RenderBlendMask renderObject) {
-    renderObject.blendMode = blendMode;
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    (renderObject as _RenderBlendMask).blendMode = blendMode;
   }
 }
 
 class _RenderBlendMask extends RenderProxyBox {
   BlendMode blendMode;
-  _RenderBlendMask(this.blendMode) : super();
+  _RenderBlendMask(this.blendMode);
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    context.canvas.saveLayer(null, Paint()..blendMode = blendMode);
-    if (child != null) {
-      context.paintChild(child!, offset);
-    }
+    context.canvas.saveLayer(offset & size, Paint()..blendMode = blendMode);
+    super.paint(context, offset);
     context.canvas.restore();
   }
 }

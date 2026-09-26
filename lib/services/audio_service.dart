@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import '../models/track.dart';
+import '../models/album.dart';
 import 'lock_screen_audio_handler.dart';
 
 class PittyAudioService {
@@ -33,37 +34,7 @@ class PittyAudioService {
 
   Future<void> loadTracks() async {
     if (_tracksLoaded) return;
-    _tracks = [];
-    final hardcodedTracks = [
-      Track(
-        path: 'assets/musicas/01 -  Leprechaun.mp3',
-        title: 'Leprechaun',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/02 - Cocaine Bread.mp3',
-        title: 'Cocaine Bread',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/03 - Forbidden Tree.mp3',
-        title: 'Forbidden Tree',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/04 - Mary\'s Secret Box.mp3',
-        title: 'Mary\'s Secret Box',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/05 - Silent Sky.mp3',
-        title: 'Silent Sky',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-    ];
-
-    _tracks.addAll(hardcodedTracks);
-    _tracks.sort((a, b) => a.title.compareTo(b.title));
+    _tracks = kAlbums.first.tracks;
 
     // Initialize lock screen handler with playlist
     await _audioHandler.initializePlaylist(_tracks);
@@ -72,6 +43,17 @@ class PittyAudioService {
       _currentTrack = _tracks.first;
     }
     _tracksLoaded = true;
+  }
+
+  Future<void> loadAlbum(Album album) async {
+    _tracks = album.tracks;
+    _currentTrack = null;
+
+    await _audioHandler.initializePlaylist(_tracks);
+
+    if (_tracks.isNotEmpty) {
+      _currentTrack = _tracks.first;
+    }
   }
 
   Future<void> play(Track track) async {
@@ -182,3 +164,5 @@ class PittyAudioService {
     _player.dispose();
   }
 }
+
+typedef AudioService = PittyAudioService;

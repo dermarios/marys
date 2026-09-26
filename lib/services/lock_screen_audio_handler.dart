@@ -66,7 +66,6 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
   Future<void> initializePlaylist(List<Track> tracks) async {
     try {
       _mediaItems = [];
-      _playlist.children.clear();
 
       // Prepare artwork first (copy from assets to filesystem)
       if (tracks.isNotEmpty && tracks.first.imageAsset != null) {
@@ -92,11 +91,13 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
         mediaItem.add(items.first);
       }
 
-      // Load audio sources from assets
-      await _playlist.addAll([
-        for (final track in tracks) AudioSource.asset(track.path, tag: track.toMediaItem()),
-      ]);
-      await _player.setAudioSource(_playlist);
+      // Create new playlist with audio sources from assets
+      final newPlaylist = ConcatenatingAudioSource(
+        children: [
+          for (final track in tracks) AudioSource.asset(track.path, tag: track.toMediaItem()),
+        ],
+      );
+      await _player.setAudioSource(newPlaylist);
       print('✓ Playlist initialized with ${_mediaItems.length} tracks');
     } catch (e) {
       print('✗ Error initializing playlist: $e');

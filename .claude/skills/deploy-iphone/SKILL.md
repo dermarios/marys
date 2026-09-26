@@ -24,13 +24,7 @@ Se o usuario ja informou o nome do dispositivo, use-o. Caso contrario:
 A busca pelo nome ignora maiusculas e acentos e aceita trecho do nome
 ("mario" encontra "iPhone de Mário").
 
-## Passo 2 - Avisar sobre o ambiente da API
-
-Antes de rodar, informe ao usuario em uma linha: o build release sempre usa a API de producao
-(`https://console.forven.com.br`), pois `lib/services/api_config.dart` so aplica
-`DEBUG_API_IP` em `kDebugMode`. Nao altere esse arquivo sem pedido explicito.
-
-## Passo 3 - Executar o script
+## Passo 2 - Executar o script
 
 Na raiz do repositorio:
 
@@ -47,7 +41,7 @@ Opcoes:
 
 O script usa `fvm flutter` quando o fvm esta instalado (versao definida em `.fvmrc`).
 
-## Passo 4 - Interpretar o resultado
+## Passo 3 - Interpretar o resultado
 
 | Codigo | Significado | O que fazer |
 |---|---|---|

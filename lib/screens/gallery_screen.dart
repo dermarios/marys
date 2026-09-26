@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../services/audio_service.dart' as pitty_audio;
+import 'package:msb_just/services/audio_service.dart';
 import 'liquid_player_screen.dart';
 
 /// Galeria de fotos do artista — mesma linguagem Liquid Glass.
@@ -9,7 +9,7 @@ import 'liquid_player_screen.dart';
 /// As fotos vêm de `assets/`; troque a lista `_fotos` pelos arquivos reais e
 /// declare-os no pubspec.yaml.
 class GalleryScreen extends StatefulWidget {
-  final pitty_audio.PittyAudioService audioService;
+  final AudioService audioService;
   const GalleryScreen({super.key, required this.audioService});
 
   @override

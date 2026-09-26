@@ -6,6 +6,7 @@ import 'screens/liquid_player_screen.dart';
 import 'screens/gallery_screen.dart';
 import 'screens/credits_screen.dart';
 import 'screens/artist_screen.dart';
+import 'widgets/mini_player.dart';
 
 late LockScreenAudioHandler audioHandler;
 
@@ -17,7 +18,7 @@ void main() async {
     builder: () => LockScreenAudioHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.forven.pittyplayer.channel.audio',
-      androidNotificationChannelName: 'Mary\'s Secret Box',
+      androidNotificationChannelName: 'Just',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
     final audioService = pitty_audio.PittyAudioService(audioHandler);
 
     return MaterialApp(
-      title: 'Mary\'s Secret Box',
+      title: 'Just',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -63,7 +64,7 @@ class _HomeWithSwipeState extends State<HomeWithSwipe> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+    _pageController = PageController(initialPage: 0);
   }
 
   @override
@@ -79,43 +80,21 @@ class _HomeWithSwipeState extends State<HomeWithSwipe> {
       children: [
         ArtistScreen(
           audioService: widget.audioService,
-          onBackPressed: () {
-            _pageController.animateToPage(
-              1,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-          onPlayPressed: () {
-            _pageController.animateToPage(
-              1,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
         ),
         LiquidPlayerScreen(
           audioService: widget.audioService,
-          onNavigateToSide: () {
-            _pageController.animateToPage(
-              2,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-          onNavigateToArtist: () {
-            _pageController.animateToPage(
-              0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
         ),
-        GalleryScreen(
+        PlayerShell(
           audioService: widget.audioService,
+          child: GalleryScreen(
+            audioService: widget.audioService,
+          ),
         ),
-        CreditsScreen(
+        PlayerShell(
           audioService: widget.audioService,
+          child: CreditsScreen(
+            audioService: widget.audioService,
+          ),
         ),
       ],
     );

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../services/audio_service.dart' as pitty_audio;
+import 'package:msb_just/services/audio_service.dart';
 import 'liquid_player_screen.dart';
 
 /// Créditos da obra — produção, composição, banda, fotografia e arte.
 /// Substitua a constante `kCreditos` pelos créditos reais.
 class CreditsScreen extends StatefulWidget {
-  final pitty_audio.PittyAudioService audioService;
+  final AudioService audioService;
   const CreditsScreen({super.key, required this.audioService});
 
   @override
@@ -34,7 +34,7 @@ const kCreditos = <_Secao>[
     ('Sérgio Lund', 'Masterização'),
   ]),
   _Secao('Banda', [
-    ('Mary\'s Secret Box', 'Voz e guitarra base'),
+    ('Pitty', 'Voz e guitarra base'),
     ('Duda Machado', 'Guitarra solo'),
     ('Joana Alves', 'Baixo'),
     ('Téo Barreto', 'Bateria'),

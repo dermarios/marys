@@ -4,9 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../models/track.dart';
-import '../services/audio_service.dart' as pitty_audio;
-import 'artist_screen.dart';
+import 'package:msb_just/data/track_content.dart';
+import 'package:msb_just/models/track.dart';
+import 'package:msb_just/services/audio_service.dart';
+import 'package:msb_just/widgets/player_cards.dart';
 
 /// Tela "Tocando agora" — conceito Liquid Glass.
 /// Drop-in: no main.dart use
@@ -182,16 +183,14 @@ class VeuFundo extends StatelessWidget {
 }
 
 class LiquidPlayerScreen extends StatefulWidget {
-  final pitty_audio.PittyAudioService audioService;
-  final VoidCallback? onNavigateToSide;
-  final VoidCallback? onNavigateToArtist;
+  final AudioService audioService;
 
-  const LiquidPlayerScreen({
-    super.key,
-    required this.audioService,
-    this.onNavigateToSide,
-    this.onNavigateToArtist,
-  });
+  /// true = versão aberta pelo player flutuante: a lista mostra só a faixa
+  /// atual e abaixo vêm Letra, Clipe, Sobre, Vídeos de fãs, Regravações,
+  /// Créditos e links de streaming.
+  final bool expandido;
+
+  const LiquidPlayerScreen({super.key, required this.audioService, this.expandido = false});
 
   @override
   State<LiquidPlayerScreen> createState() => _LiquidPlayerScreenState();
@@ -201,16 +200,22 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco; // troque para especular / lente
+  final Set<String> _liked = {};
   double _dragX = 0;
   double? _scrubValue;
-
-  late Future<void> _loadFuture;
 
   @override
   void initState() {
     super.initState();
     _blobs = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
-    _loadFuture = widget.audioService.loadTracks();
+    _load();
+  }
+
+  Future<void> _load() async {
+    if (widget.audioService.tracks.isEmpty) {
+      await widget.audioService.loadTracks();
+      if (mounted) setState(() {});
+    }
   }
 
   @override
@@ -240,8 +245,10 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
           FundoLiquido(animation: _blobs, paleta: _paleta),
           const VeuFundo(),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            bottom: false,
+            child: SingleChildScrollView(
+              // rolagem geral da tela; 120 px no fim para o player flutuante
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
               child: Column(
                 children: [
                   _barraTopo(),
@@ -254,12 +261,18 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   const SizedBox(height: 6),
                   _controles(),
                   const SizedBox(height: 16),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: _loadFuture,
-                      builder: (_, __) => _listaFaixas(),
-                    ),
-                  ),
+                  _listaFaixas(),
+                  const SizedBox(height: 12),
+                  if (widget.expandido)
+                    ...cardsPlayerExpandido(context, widget.audioService)
+                  else ...[
+                    ClipeCard(conteudo: conteudoDe(track), titulo: track?.title ?? ''),
+                    const SizedBox(height: 12),
+                    for (final a in kAlbuns) ...[
+                      AlbumSpotifyCard(album: a),
+                      const SizedBox(height: 10),
+                    ],
+                  ],
                 ],
               ),
             ),
@@ -273,7 +286,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
   Widget _barraTopo() {
     return Row(
       children: [
-        _iconeVidro(Icons.chevron_left_rounded, widget.onNavigateToArtist ?? () {}),
+        _iconeVidro(Icons.keyboard_arrow_down_rounded, () => Navigator.of(context).maybePop()),
         Expanded(
           child: Column(
             children: [
@@ -281,14 +294,14 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   style: TextStyle(
                       fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.55))),
               const SizedBox(height: 3),
-              const Text('Mary\'s Secret Box',
+              const Text('Forven · Pitty',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
             ],
           ),
         ),
-        _iconeVidro(Icons.chevron_right_rounded, widget.onNavigateToSide ?? () {}),
+        _iconeVidro(Icons.more_horiz_rounded, () {}),
       ],
     );
   }
@@ -313,9 +326,9 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
       onHorizontalDragUpdate: (d) => setState(() => _dragX += d.delta.dx),
       onHorizontalDragEnd: (_) async {
         if (_dragX < -62) {
-          await widget.audioService.previous();
-        } else if (_dragX > 62) {
           await widget.audioService.next();
+        } else if (_dragX > 62) {
+          await widget.audioService.previous();
         }
         if (mounted) setState(() => _dragX = 0);
       },
@@ -366,7 +379,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── título + curtir ────────────────────────────────────────────────
   Widget _titulo(Track? track) {
-    final liked = track != null && widget.audioService.isLiked(track);
+    final liked = track != null && _liked.contains(track.path);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -382,15 +395,14 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     fontSize: 25, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: Colors.white),
               ),
               const SizedBox(height: 4),
-              Text('Mary\'s Secret Box', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
+              Text('Pitty', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
             ],
           ),
         ),
         GestureDetector(
           onTap: () {
             if (track == null) return;
-            widget.audioService.toggleLike(track);
-            setState(() {});
+            setState(() => liked ? _liked.remove(track.path) : _liked.add(track.path));
           },
           child: AnimatedScale(
             scale: liked ? 1.12 : 1,
@@ -468,15 +480,10 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
       stream: _player.playingStream,
       builder: (context, snap) {
         final playing = snap.data ?? false;
-        final shuffle = widget.audioService.shuffleMode;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-              onTap: () => setState(() => widget.audioService.toggleShuffle()),
-              child: Icon(Icons.shuffle_rounded,
-                  color: Colors.white.withOpacity(shuffle ? 1 : 0.42), size: 20),
-            ),
+            Icon(Icons.shuffle_rounded, color: Colors.white.withOpacity(0.42), size: 20),
             IconButton(
               iconSize: 30,
               color: Colors.white,
@@ -510,20 +517,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
               },
               icon: const Icon(Icons.skip_next_rounded),
             ),
-            GestureDetector(
-              onTap: () => setState(() => widget.audioService.toggleRepeatMode()),
-              child: Icon(
-                widget.audioService.repeatMode == 0
-                    ? Icons.repeat_rounded
-                    : widget.audioService.repeatMode == 1
-                        ? Icons.repeat_one_rounded
-                        : Icons.repeat_rounded,
-                color: widget.audioService.repeatMode == 0
-                    ? Colors.white.withOpacity(0.6)
-                    : Colors.white.withOpacity(0.9),
-                size: 20,
-              ),
-            ),
+            Icon(Icons.repeat_rounded, color: Colors.white.withOpacity(0.9), size: 20),
           ],
         );
       },
@@ -532,23 +526,23 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── lista de faixas numerada (no lugar da letra/fila) ──────────────
   Widget _listaFaixas() {
-    final tracks = widget.audioService.tracks;
+    final todas = widget.audioService.tracks;
+    final tracks = widget.expandido
+        ? todas.where((t) => t == widget.audioService.currentTrack).toList()
+        : todas;
     return Glass(
       mode: _mode,
       radius: 24,
       child: tracks.isEmpty
-          ? Center(
-              child: Text('Nenhuma faixa em assets/musicas/',
+          ? Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
                   style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)))
-          : ShaderMask(
-              shaderCallback: (rect) => const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.black, Colors.black, Colors.transparent],
-                stops: [0, 0.86, 1],
-              ).createShader(rect),
-              blendMode: BlendMode.dstIn,
-              child: ListView.builder(
+          : Builder(
+              // sem rolagem própria: a altura acompanha a quantidade de faixas
+              builder: (_) => ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                 itemCount: tracks.length,
                 itemBuilder: (_, i) {
@@ -572,7 +566,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                           SizedBox(
                             width: 19,
                             child: Text(
-                              (i + 1).toString().padLeft(2, '0'),
+                              (todas.indexOf(t) + 1).toString().padLeft(2, '0'),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 10.5,
@@ -605,7 +599,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white.withOpacity(atual ? 1 : 0.88))),
-                                Text('Mary\'s Secret Box',
+                                Text('Pitty',
                                     style: TextStyle(
                                         fontSize: 11, color: Colors.white.withOpacity(0.6))),
                               ],
@@ -618,26 +612,6 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white.withOpacity(0.55)),
                           ),
-                          if (atual && widget.audioService.repeatMode > 0)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: Icon(
-                                widget.audioService.repeatMode == 1
-                                    ? Icons.repeat_one_rounded
-                                    : Icons.repeat_rounded,
-                                size: 16,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
-                            ),
-                          if (widget.audioService.isLiked(t))
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: Icon(
-                                Icons.favorite_rounded,
-                                size: 16,
-                                color: Colors.red.withOpacity(0.8),
-                              ),
-                            ),
                         ],
                       ),
                     ),
