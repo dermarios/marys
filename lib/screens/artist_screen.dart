@@ -6,7 +6,6 @@ import 'package:flutter/rendering.dart';
 
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/models/album.dart';
-import 'package:msb_just/widgets/mini_player.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
 
@@ -25,18 +24,9 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
   bool _curtido = false;
+  bool _carregandoAlbum = false;
 
   static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
-
-  /// Discografia — confira títulos/anos antes de publicar.
-  static const _disco = [
-    (titulo: 'Admirável Chip Novo', ano: '2003', tipo: 'Álbum'),
-    (titulo: 'Anacrônico', ano: '2005', tipo: 'Álbum'),
-    (titulo: '{Des}Concerto Ao Vivo', ano: '2007', tipo: 'Ao vivo'),
-    (titulo: 'Chiaroscuro', ano: '2009', tipo: 'Álbum'),
-    (titulo: 'SETEVIDAS', ano: '2014', tipo: 'Álbum'),
-    (titulo: 'Matriz', ano: '2019', tipo: 'Álbum'),
-  ];
 
   /// Mais tocadas — valores de exemplo. Se o título existir em tracks.json,
   /// o toque toca a faixa local.
@@ -66,26 +56,40 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   void _abrirPlayer() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: true),
+        builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: false),
       ),
     );
   }
 
-  Future<void> _carregarAlbum(Album album) async {
-    await widget.audioService.loadAlbum(album);
-    if (album.tracks.isNotEmpty) {
-      await widget.audioService.play(album.tracks.first);
+  void _carregarAlbum(Album album) {
+    if (_carregandoAlbum) {
+      print('[ArtistScreen] Já carregando um álbum, ignorando novo toque');
+      return;
     }
-    if (mounted) {
-      setState(() {});
-      _abrirPlayer();
-    }
+
+    _carregandoAlbum = true;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    widget.audioService.playAlbum(album).then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    }).catchError((e) {
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('Erro ao carregar álbum: $e')),
+        );
+      }
+      print('[ArtistScreen] ERRO ao carregar álbum: $e');
+    }).whenComplete(() {
+      _carregandoAlbum = false;
+    });
+
+    _abrirPlayer();
   }
 
   @override
   Widget build(BuildContext context) {
-    final n = widget.audioService.tracks.length;
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -206,12 +210,10 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () async {
-                            final t = widget.audioService.tracks.isNotEmpty
-                                ? widget.audioService.tracks.first
-                                : null;
-                            if (t != null) await widget.audioService.play(t);
-                            if (mounted) _abrirPlayer();
+                          onTap: () {
+                            final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
+                            widget.audioService.playAlbum(currentAlbum);
+                            _abrirPlayer();
                           },
                           child: Glass(
                             mode: _mode,
@@ -260,10 +262,12 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       itemBuilder: (_, i) {
                         final album = kAlbums[i];
                         return GestureDetector(
-                          onTap: () async {
-                            await _carregarAlbum(album);
+                          onTap: _carregandoAlbum ? null : () {
+                            _carregarAlbum(album);
                           },
-                          child: Column(
+                          child: Opacity(
+                            opacity: _carregandoAlbum ? 0.5 : 1.0,
+                            child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
@@ -300,6 +304,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                 ),
                               ),
                             ],
+                            ),
                           ),
                         );
                       },
@@ -340,14 +345,17 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
         ],
       );
 
-  /// Toca a faixa local cujo título (ou álbum) bate; senão não faz nada.
-  Future<void> _tocarPorTitulo(String titulo, {bool album = false}) async {
+  void _tocarPorTitulo(String titulo, {bool album = false}) {
     final s = widget.audioService;
     final alvo = s.tracks.where((t) => t.title.toLowerCase() == titulo.toLowerCase());
     if (alvo.isEmpty) return;
-    await s.play(alvo.first);
-    if (!mounted) return;
-    setState(() {});
+
+    s.play(alvo.first).then((_) {
+      if (mounted) setState(() {});
+    }).catchError((e) {
+      print('Erro ao tocar $titulo: $e');
+    });
+
     if (album) _abrirPlayer();
   }
 
