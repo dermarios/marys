@@ -226,7 +226,7 @@ class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProvider
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
-                width: 36,
+                width: 108,
                 height: 20,
                 decoration: BoxDecoration(
                   color: const Color(0xFF14121E).withOpacity(0.72),
