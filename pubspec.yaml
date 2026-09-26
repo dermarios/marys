@@ -81,7 +81,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 flutter_launcher_icons:
-  image_path: "assets/jorge-daux-icon.webp"
+  image_path: "assets/app-icon.jpeg"
   ios: true
-  image_path_ios: "assets/jorge-daux-icon.webp"
+  image_path_ios: "assets/app-icon.jpeg"
   remove_alpha_ios: true
