@@ -137,19 +137,6 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).maybePop(),
-                        child: Glass(
-                          mode: _mode,
-                          radius: 19,
-                          child: SizedBox(
-                            width: 38,
-                            height: 38,
-                            child: Icon(Icons.chevron_left_rounded,
-                                size: 22, color: Colors.white.withOpacity(0.9)),
-                          ),
-                        ),
-                      ),
                       Glass(
                         mode: _mode,
                         radius: 16,
@@ -174,6 +161,23 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                     letterSpacing: 1.4,
                                     color: Colors.white.withOpacity(0.9))),
                           ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: false),
+                          ),
+                        ),
+                        child: Glass(
+                          mode: _mode,
+                          radius: 19,
+                          child: SizedBox(
+                            width: 38,
+                            height: 38,
+                            child: Icon(Icons.chevron_right_rounded,
+                                size: 22, color: Colors.white.withOpacity(0.9)),
+                          ),
                         ),
                       ),
                     ],
