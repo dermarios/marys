@@ -212,9 +212,13 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
   }
 
   Future<void> _load() async {
+    // Se não há tracks carregados, carrega os padrão
     if (widget.audioService.tracks.isEmpty) {
+      print('[LiquidPlayer] Carregando tracks padrão...');
       await widget.audioService.loadTracks();
       if (mounted) setState(() {});
+    } else {
+      print('[LiquidPlayer] Tracks já carregadas: ${widget.audioService.tracks.length} faixas');
     }
   }
 
@@ -324,11 +328,11 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
     final size = math.min(MediaQuery.of(context).size.width - 80, 268.0);
     return GestureDetector(
       onHorizontalDragUpdate: (d) => setState(() => _dragX += d.delta.dx),
-      onHorizontalDragEnd: (_) async {
+      onHorizontalDragEnd: (_) {
         if (_dragX < -62) {
-          await widget.audioService.next();
+          widget.audioService.next();
         } else if (_dragX > 62) {
-          await widget.audioService.previous();
+          widget.audioService.previous();
         }
         if (mounted) setState(() => _dragX = 0);
       },
@@ -487,15 +491,15 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
             IconButton(
               iconSize: 30,
               color: Colors.white,
-              onPressed: () async {
-                await widget.audioService.previous();
+              onPressed: () {
+                widget.audioService.previous();
                 setState(() {});
               },
               icon: const Icon(Icons.skip_previous_rounded),
             ),
             GestureDetector(
-              onTap: () async {
-                playing ? await widget.audioService.pause() : await widget.audioService.resume();
+              onTap: () {
+                playing ? widget.audioService.pause() : widget.audioService.resume();
               },
               child: Glass(
                 mode: _mode,
@@ -511,8 +515,8 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
             IconButton(
               iconSize: 30,
               color: Colors.white,
-              onPressed: () async {
-                await widget.audioService.next();
+              onPressed: () {
+                widget.audioService.next();
                 setState(() {});
               },
               icon: const Icon(Icons.skip_next_rounded),
@@ -550,8 +554,8 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   final atual = t == widget.audioService.currentTrack;
                   return GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      await widget.audioService.play(t);
+                    onTap: () {
+                      widget.audioService.play(t);
                       if (mounted) setState(() {});
                     },
                     child: Container(
