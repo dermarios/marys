@@ -267,11 +267,25 @@ class AlbumSpotifyCard extends StatelessWidget {
     return GestureDetector(
       onTap: info['acao'] as VoidCallback,
       child: _LinhaServico(
-        leading: Image.asset(
-          info['logo'] as String,
+        leading: Container(
           width: 52,
           height: 52,
-          fit: BoxFit.contain,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: (info['cor'] as Color).withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Image.asset(
+            info['logo'] as String,
+            width: 32,
+            height: 32,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Icon(
+              Icons.music_note_rounded,
+              size: 24,
+              color: info['cor'] as Color,
+            ),
+          ),
         ),
         titulo: album.nome,
         subtitulo: info['subtitulo'] as String,
