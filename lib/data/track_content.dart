@@ -32,23 +32,12 @@ const _letraExemplo = <String>[
 
 /// Chave = Track.title (como aparece no tracks.json).
 const kConteudo = <String, ConteudoFaixa>{
-  'Leprechaun': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Painted on Your Face': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'All the Pleasures for You': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Weird': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Suicide Playground': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Carry Me to Chaos': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
   'Until the Day You Be Born': ConteudoFaixa(
     letra: _letraExemplo,
     clipeYoutubeId: 'XMaYPNlArYA',
     clipeLabel: 'STUDIO SESSIONS',
     clipeTitulo: 'Until the Day You Be Born',
   ),
-  'Corruption Messiah': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Forbidden Tree': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Cocaine Bread': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Marys Secret Box': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Silent Sky': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
 };
 
 ConteudoFaixa conteudoDe(Track? t) =>

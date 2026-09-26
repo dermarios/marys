@@ -157,22 +157,23 @@ class ClipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final id = conteudo.clipeYoutubeId;
+    if (id == null) return const SizedBox.shrink();
+
     return CardVidro(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onTap: id == null ? null : () => abrirLink('https://www.youtube.com/watch?v=$id'),
+            onTap: () => abrirLink('https://www.youtube.com/watch?v=$id'),
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Container(color: Colors.black),
-                  if (id != null)
-                    Image.network('https://img.youtube.com/vi/$id/hqdefault.jpg',
-                        fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
+                  Image.network('https://img.youtube.com/vi/$id/hqdefault.jpg',
+                      fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
