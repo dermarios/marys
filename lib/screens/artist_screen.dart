@@ -129,8 +129,8 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
-              // o conteúdo rola por cima da foto fixa; 120 px para o player flutuante
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
+              // o conteúdo rola por cima da foto fixa; espaço para o player flutuante
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 80),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -317,7 +317,6 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     _linhaTop(i),
                     if (i < _top.length - 1) const SizedBox(height: 8),
                   ],
-                  const SizedBox(height: 8),
                 ],
               ),
             ),
