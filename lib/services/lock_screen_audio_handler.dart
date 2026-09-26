@@ -1,7 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +8,6 @@ import '../models/track.dart';
 
 class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final _player = AudioPlayer();
-  final _playlist = ConcatenatingAudioSource(children: []);
   String? _artworkPath;
   bool _initialized = false;
   List<MediaItem> _mediaItems = [];
@@ -63,13 +61,13 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
     }
   }
 
-  Future<void> initializePlaylist(List<Track> tracks) async {
+  Future<void> initializePlaylist(List<Track> tracks, {int initialIndex = 0}) async {
     try {
       _mediaItems = [];
 
       // Prepare artwork first (copy from assets to filesystem)
       if (tracks.isNotEmpty && tracks.first.imageAsset != null) {
-        await _prepareArtwork(tracks.first.imageAsset!);
+        await _prepareArtwork(tracks.first.imageAsset!, sanitizedName: tracks.first.title);
       }
 
       // Build playlist from tracks
@@ -87,7 +85,9 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
 
       _mediaItems = items;
       queue.add(items);
-      if (items.isNotEmpty) {
+      if (items.isNotEmpty && initialIndex < items.length) {
+        mediaItem.add(items[initialIndex]);
+      } else if (items.isNotEmpty) {
         mediaItem.add(items.first);
       }
 
@@ -97,31 +97,33 @@ class LockScreenAudioHandler extends BaseAudioHandler with QueueHandler, SeekHan
           for (final track in tracks) AudioSource.asset(track.path, tag: track.toMediaItem()),
         ],
       );
-      await _player.setAudioSource(newPlaylist);
-      print('✓ Playlist initialized with ${_mediaItems.length} tracks');
+      await _player.setAudioSource(newPlaylist, initialIndex: initialIndex, initialPosition: Duration.zero);
+      print('✓ Playlist initialized with ${_mediaItems.length} tracks (starting at index $initialIndex)');
     } catch (e) {
       print('✗ Error initializing playlist: $e');
       rethrow;
     }
   }
 
-  Future<void> _prepareArtwork(String assetPath) async {
+  Future<void> _prepareArtwork(String assetPath, {String? sanitizedName}) async {
     try {
       final appDocDir = await getApplicationDocumentsDirectory();
-      final destPath = '${appDocDir.path}/cover.jpg';
+      final fileName = sanitizedName != null
+          ? 'artwork_${sanitizedName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.jpg'
+          : 'cover.jpg';
+      final destPath = '${appDocDir.path}/$fileName';
       final destFile = File(destPath);
 
-      if (!await destFile.exists()) {
-        // Load from assets and write to documents directory
-        final assetData = await rootBundle.load(assetPath);
-        await destFile.writeAsBytes(
-          assetData.buffer.asUint8List(
-            assetData.offsetInBytes,
-            assetData.lengthInBytes,
-          ),
-        );
-      }
+      // Load from assets and write to documents directory (overwrite to update)
+      final assetData = await rootBundle.load(assetPath);
+      await destFile.writeAsBytes(
+        assetData.buffer.asUint8List(
+          assetData.offsetInBytes,
+          assetData.lengthInBytes,
+        ),
+      );
       _artworkPath = destPath;
+      print('✓ Artwork saved to $destPath');
     } catch (e) {
       print('Error preparing artwork: $e');
       _artworkPath = null;
