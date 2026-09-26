@@ -79,7 +79,7 @@ const kAlbunsRelacionados = <String, List<AlbumSpotify>>{
   'just': <AlbumSpotify>[
     AlbumSpotify('Just', '6gzUED8aFdwlH2Li60D8Oe', 0, servico: ServicoStreaming.spotify),
     AlbumSpotify('Just', '1105047334', 1, servico: ServicoStreaming.appleMusic),
-    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
+    AlbumSpotify('Just', '34vHFnplKrXFhCl8DMNBF', 2, servico: ServicoStreaming.deezer),
   ],
   'beyond-smoke': <AlbumSpotify>[
     AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0, servico: ServicoStreaming.spotify),
@@ -147,3 +147,4 @@ String linkSpotify(String t) => 'https://open.spotify.com/search/${_q(t)}';
 String linkAppleMusic(String t) => 'https://music.apple.com/br/search?term=${_q(t)}';
 String linkAppleMusicAlbum(String id) => 'https://music.apple.com/br/album/just/$id';
 String linkDeezer(String t) => 'https://www.deezer.com/search/${_q(t)}';
+String linkDeezerAlbum(String id) => 'https://link.deezer.com/s/$id';

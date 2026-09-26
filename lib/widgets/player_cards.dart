@@ -256,7 +256,7 @@ class AlbumSpotifyCard extends StatelessWidget {
           'cor': const Color(0xFFA238FF),
           'tinta': Colors.white,
           'subtitulo': 'Abrir álbum no Deezer',
-          'acao': () => abrirLink(linkDeezer(album.nome)),
+          'acao': () => abrirLink(linkDeezerAlbum(album.spotifyId)),
         };
     }
   }
