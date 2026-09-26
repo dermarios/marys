@@ -223,7 +223,7 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.white)),
-                                  Text('Pitty',
+                                  Text('Mary\'s Secret Box',
                                       style: TextStyle(
                                           fontSize: 11.5, color: Colors.white.withOpacity(0.6))),
                                 ],
@@ -317,7 +317,7 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
                                             color: Colors.white.withOpacity(ehAtual ? 1 : 0.88))),
-                                    Text('Pitty',
+                                    Text('Mary\'s Secret Box',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(

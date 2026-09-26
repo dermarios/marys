@@ -371,7 +371,7 @@ class SobreArtistaCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Pitty',
+                  const Text('Mary\'s Secret Box',
                       style: TextStyle(
                           fontSize: 24, fontStyle: FontStyle.italic, color: Colors.white)),
                   const SizedBox(height: 4),

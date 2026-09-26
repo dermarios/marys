@@ -106,7 +106,7 @@ class MiniPlayer extends StatelessWidget {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white)),
-                                Text('Pitty',
+                                Text('Mary\'s Secret Box',
                                     style: TextStyle(
                                         fontSize: 11.5, color: Colors.white.withOpacity(0.65))),
                               ],

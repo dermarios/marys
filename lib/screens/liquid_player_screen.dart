@@ -291,7 +291,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
   // ─── topo ───────────────────────────────────────────────────────────
   Widget _barraTopo() {
     final album = widget.audioService.currentAlbumNotifier.value;
-    final albumTitle = album?.title.replaceAll('\n', ' ') ?? 'Forven · Pitty';
+    final albumTitle = album?.title.replaceAll('\n', ' ') ?? 'Forven · Mary\'s Secret Box';
 
     return Row(
       children: [
@@ -405,7 +405,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     fontSize: 25, fontWeight: FontWeight.w600, letterSpacing: -0.5, color: Colors.white),
               ),
               const SizedBox(height: 4),
-              Text('Pitty', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
+              Text('Mary\'s Secret Box', style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.62))),
             ],
           ),
         ),

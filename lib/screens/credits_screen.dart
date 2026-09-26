@@ -34,7 +34,7 @@ const kCreditos = <_Secao>[
     ('Sérgio Lund', 'Masterização'),
   ]),
   _Secao('Banda', [
-    ('Pitty', 'Voz e guitarra base'),
+    ('Mary\'s Secret Box', 'Voz e guitarra base'),
     ('Duda Machado', 'Guitarra solo'),
     ('Joana Alves', 'Baixo'),
     ('Téo Barreto', 'Bateria'),
