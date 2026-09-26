@@ -80,7 +80,10 @@ class LetraCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final letra = conteudoDe(audioService.currentTrack).letra;
+    return ListenableBuilder(
+      listenable: audioService.currentTrackNotifier,
+      builder: (context, _) {
+        final letra = conteudoDe(audioService.currentTrack).letra;
     return CardVidro(
       titulo: 'Letra',
       acao: GestureDetector(
@@ -132,6 +135,8 @@ class LetraCard extends StatelessWidget {
           );
         },
       ),
+    );
+      },
     );
   }
 }

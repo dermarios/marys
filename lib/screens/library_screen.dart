@@ -68,6 +68,17 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final s = widget.audioService;
+    return ListenableBuilder(
+      listenable:
+          Listenable.merge([s.currentTrackNotifier, s.currentAlbumNotifier]),
+      builder: (context, _) {
+        return _buildLibrary();
+      },
+    );
+  }
+
+  Widget _buildLibrary() {
     final atual = widget.audioService.currentTrack;
     final lista = _lista;
 

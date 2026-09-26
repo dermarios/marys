@@ -50,14 +50,20 @@ class MiniPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
-      child: StreamBuilder<PlayerState>(
-        stream: _p.playerStateStream,
-        builder: (context, snap) {
+      child: ListenableBuilder(
+        listenable: Listenable.merge(
+            [audioService.currentTrackNotifier, audioService.currentAlbumNotifier]),
+        builder: (context, _) {
           final track = audioService.currentTrack;
           if (track == null) return const SizedBox.shrink();
-          final tocando = snap.data?.playing ?? false;
-          final i = audioService.tracks.indexOf(track).clamp(0, 999);
-          final paleta = kPaletas[i % kPaletas.length];
+          return StreamBuilder<PlayerState>(
+            stream: _p.playerStateStream,
+            builder: (context, snap) {
+              final tocando = snap.data?.playing ?? false;
+              final faixas = audioService.currentAlbumNotifier.value?.tracks ??
+                  audioService.tracks;
+              final i = faixas.indexOf(track).clamp(0, 999);
+              final paleta = kPaletas[i % kPaletas.length];
 
           return GestureDetector(
             onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
@@ -142,6 +148,8 @@ class MiniPlayer extends StatelessWidget {
                 ),
               ),
             ),
+            );
+            },
           );
         },
       ),
