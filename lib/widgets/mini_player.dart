@@ -90,7 +90,7 @@ class MiniPlayer extends StatelessWidget {
               child: SizedBox(
                 height: 64,
                 child: Stack(
-                  overflow: Overflow.visible,
+                  clipBehavior: Clip.none,
                   children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 8, 0),
