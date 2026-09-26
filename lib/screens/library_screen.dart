@@ -58,8 +58,8 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
 
   String _fmt(Duration d) => '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 
-  void _abrirPlayer([Track? t]) async {
-    if (t != null) await widget.audioService.play(t);
+  void _abrirPlayer([Track? t]) {
+    if (t != null) widget.audioService.play(t);
     if (!mounted) return;
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => LiquidPlayerScreen(audioService: widget.audioService),
@@ -361,10 +361,10 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
                               builder: (_, snap) {
                                 final tocando = snap.data ?? false;
                                 return GestureDetector(
-                                  onTap: () async {
+                                  onTap: () {
                                     tocando
-                                        ? await widget.audioService.pause()
-                                        : await widget.audioService.resume();
+                                        ? widget.audioService.pause()
+                                        : widget.audioService.resume();
                                   },
                                   child: Container(
                                     width: 38,
