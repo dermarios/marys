@@ -85,13 +85,16 @@ class MiniPlayer extends StatelessWidget {
 
           return GestureDetector(
             onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
-            child: Glass(
-              radius: 22,
-              child: SizedBox(
-                height: 64,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Glass(
+                  radius: 22,
+                  child: SizedBox(
+                    height: 64,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 8, 0),
                       child: Row(
@@ -163,19 +166,21 @@ class MiniPlayer extends StatelessWidget {
                         },
                       ),
                     ),
-                    Positioned(
-                      top: -20,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: BotaoExpandir(
-                          onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: -20,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: BotaoExpandir(
+                      onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                    ),
+                  ),
+                ),
+              ],
             ),
             );
             },
