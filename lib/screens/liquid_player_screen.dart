@@ -8,6 +8,7 @@ import 'package:msb_just/data/track_content.dart';
 import 'package:msb_just/models/track.dart';
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/widgets/player_cards.dart';
+import 'package:msb_just/widgets/mini_player.dart';
 
 /// Tela "Tocando agora" — conceito Liquid Glass.
 /// Drop-in: no main.dart use
@@ -275,6 +276,12 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                 ],
               ),
             ),
+          ),
+          Positioned(
+            left: 10,
+            right: 10,
+            bottom: MediaQuery.of(context).padding.bottom + 8,
+            child: MiniPlayer(audioService: widget.audioService),
           ),
         ],
       ),
