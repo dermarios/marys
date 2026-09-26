@@ -550,14 +550,12 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                 itemBuilder: (_, i) {
                   final t = tracks[i];
                   final atual = t == widget.audioService.currentTrack;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        widget.audioService.play(t);
-                      },
-                      child: Stack(
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      widget.audioService.play(t);
+                    },
+                    child: Stack(
                       children: [
                         Glass(
                           mode: _mode,
@@ -617,7 +615,6 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                             ),
                           ),
                       ],
-                    ),
                     ),
                   );
                 },
