@@ -533,15 +533,13 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
     final tracks = widget.expandido
         ? todas.where((t) => t == widget.audioService.currentTrack).toList()
         : todas;
-    return Glass(
-      mode: _mode,
-      radius: 24,
-      child: tracks.isEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)))
-          : Builder(
+    if (tracks.isEmpty) {
+      return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
+              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)));
+    }
+    return Builder(
               // sem rolagem própria: a altura acompanha a quantidade de faixas
               builder: (_) => ListView.separated(
                 shrinkWrap: true,
@@ -624,7 +622,6 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   );
                 },
               ),
-            ),
-    );
+            );
   }
 }
