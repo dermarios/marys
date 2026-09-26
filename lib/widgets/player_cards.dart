@@ -247,7 +247,7 @@ class AlbumSpotifyCard extends StatelessWidget {
           'cor': const Color(0xFFFA2D48),
           'tinta': Colors.white,
           'subtitulo': 'Abrir álbum no Apple Music',
-          'acao': () => abrirLink(linkAppleMusic(album.nome)),
+          'acao': () => abrirLink(linkAppleMusicAlbum(album.spotifyId)),
         };
       case ServicoStreaming.deezer:
         return {

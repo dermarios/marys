@@ -78,7 +78,7 @@ const kAlbuns = <AlbumSpotify>[
 const kAlbunsRelacionados = <String, List<AlbumSpotify>>{
   'just': <AlbumSpotify>[
     AlbumSpotify('Just', '6gzUED8aFdwlH2Li60D8Oe', 0, servico: ServicoStreaming.spotify),
-    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1, servico: ServicoStreaming.appleMusic),
+    AlbumSpotify('Just', '1105047334', 1, servico: ServicoStreaming.appleMusic),
     AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
   ],
   'beyond-smoke': <AlbumSpotify>[
@@ -145,4 +145,5 @@ Future<void> abrirSpotifyAlbum(String id) async {
 String _q(String titulo) => Uri.encodeComponent('$titulo Pitty');
 String linkSpotify(String t) => 'https://open.spotify.com/search/${_q(t)}';
 String linkAppleMusic(String t) => 'https://music.apple.com/br/search?term=${_q(t)}';
+String linkAppleMusicAlbum(String id) => 'https://music.apple.com/br/album/just/$id';
 String linkDeezer(String t) => 'https://www.deezer.com/search/${_q(t)}';
