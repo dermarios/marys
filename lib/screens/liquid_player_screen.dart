@@ -539,86 +539,120 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
           child: Text('Nenhuma faixa carregada. Selecione um álbum na tela inicial.',
               style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)));
     }
-    return Builder(
-              // sem rolagem própria: a altura acompanha a quantidade de faixas
-              builder: (_) => ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                itemCount: tracks.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (_, i) {
-                  final t = tracks[i];
-                  final atual = t == widget.audioService.currentTrack;
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      widget.audioService.play(t);
-                    },
-                    child: Stack(
-                      children: [
-                        Glass(
-                          mode: _mode,
-                          radius: 20,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                child: Text(
-                                  (todas.indexOf(t) + 1).toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white.withOpacity(atual ? 1 : 0.55)),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(t.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontSize: 14.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white)),
-                                    Text('Mary\'s Secret Box',
-                                        style: TextStyle(
-                                            fontSize: 11, color: Colors.white.withOpacity(0.62))),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                t.duration == Duration.zero ? '' : _fmt(t.duration),
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white.withOpacity(0.58)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // faixa atual: contorno claro por cima do vidro
-                        if (atual)
-                          Positioned.fill(
-                            child: IgnorePointer(
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.white.withOpacity(0.5)),
-                                ),
-                              ),
+
+    // Calcula duração total
+    final durTotal = tracks.fold<Duration>(Duration.zero, (prev, t) => prev + t.duration);
+    final minutos = durTotal.inMinutes;
+
+    return Column(
+      children: [
+        Builder(
+          // sem rolagem própria: a altura acompanha a quantidade de faixas
+          builder: (_) => ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            itemCount: tracks.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (_, i) {
+              final t = tracks[i];
+              final atual = t == widget.audioService.currentTrack;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  widget.audioService.play(t);
+                },
+                child: Stack(
+                  children: [
+                    Glass(
+                      mode: _mode,
+                      radius: 20,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            child: Text(
+                              (todas.indexOf(t) + 1).toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withOpacity(atual ? 1 : 0.55)),
                             ),
                           ),
-                      ],
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white)),
+                                Text('Mary\'s Secret Box',
+                                    style: TextStyle(
+                                        fontSize: 11, color: Colors.white.withOpacity(0.62))),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            t.duration == Duration.zero ? '' : _fmt(t.duration),
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.58)),
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
+                    // faixa atual: contorno claro por cima do vidro
+                    if (atual)
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white.withOpacity(0.5)),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total de ${tracks.length} músicas - $minutos minutos',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.65),
+                ),
               ),
-            );
+              Text(
+                '©2016 Mary\'s Secret Box',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.65),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
