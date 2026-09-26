@@ -77,7 +77,7 @@ const kAlbuns = <AlbumSpotify>[
 /// Cards de álbuns relacionados por álbum. Configurável pelo desenvolvedor.
 const kAlbunsRelacionados = <String, List<AlbumSpotify>>{
   'just': <AlbumSpotify>[
-    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0, servico: ServicoStreaming.spotify),
+    AlbumSpotify('Just', '6gzUED8aFdwlH2Li60D8Oe', 0, servico: ServicoStreaming.spotify),
     AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1, servico: ServicoStreaming.appleMusic),
     AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
   ],
