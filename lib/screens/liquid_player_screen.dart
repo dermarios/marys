@@ -232,16 +232,30 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   List<Color> get _paleta {
     final t = widget.audioService.currentTrack;
-    final i = t == null ? 0 : widget.audioService.tracks.indexOf(t);
+    final i = t == null ? 0 : _faixas.indexOf(t);
     return kPaletas[(i < 0 ? 0 : i) % kPaletas.length];
   }
 
   String _fmt(Duration d) => '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 
+  List<Track> get _faixas =>
+      widget.audioService.currentAlbumNotifier.value?.tracks ??
+      widget.audioService.tracks;
+
   @override
   Widget build(BuildContext context) {
-    final track = widget.audioService.currentTrack;
+    final s = widget.audioService;
+    return ListenableBuilder(
+      listenable:
+          Listenable.merge([s.currentTrackNotifier, s.currentAlbumNotifier]),
+      builder: (context, _) {
+        final track = s.currentTrack;
+        return _buildPlayer(track);
+      },
+    );
+  }
 
+  Widget _buildPlayer(Track? track) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0910),
       body: Stack(
@@ -288,6 +302,9 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── topo ───────────────────────────────────────────────────────────
   Widget _barraTopo() {
+    final album = widget.audioService.currentAlbumNotifier.value;
+    final albumTitle = album?.title.replaceAll('\n', ' ') ?? 'Forven · Pitty';
+
     return Row(
       children: [
         _iconeVidro(Icons.keyboard_arrow_down_rounded, () => Navigator.of(context).maybePop()),
@@ -298,10 +315,10 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   style: TextStyle(
                       fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.55))),
               const SizedBox(height: 3),
-              const Text('Forven · Pitty',
+              Text(albumTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
+                  style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
             ],
           ),
         ),
@@ -356,7 +373,8 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
               fit: StackFit.expand,
               children: [
                 Image.asset(
-                  track?.imageAsset ?? 'assets/Jorge-Daux-@jorgedaux.webp',
+                  track?.imageAsset ?? 'assets/albuns/just/Jorge-Daux-@jorgedaux.webp',
+                  key: ValueKey(track?.imageAsset),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(color: Colors.white10),
                 ),
@@ -530,7 +548,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   // ─── lista de faixas numerada (no lugar da letra/fila) ──────────────
   Widget _listaFaixas() {
-    final todas = widget.audioService.tracks;
+    final todas = _faixas;
     final tracks = widget.expandido
         ? todas.where((t) => t == widget.audioService.currentTrack).toList()
         : todas;
@@ -556,7 +574,6 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
                       widget.audioService.play(t);
-                      if (mounted) setState(() {});
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 1),
