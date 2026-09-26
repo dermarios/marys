@@ -241,7 +241,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                         ),
                       ),
                       const SizedBox(width: 10),
-                      _botaoVidro(Icons.shuffle_rounded, () {
+                      _botaoVidro(Icons.library_music_rounded, () {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => LibraryScreen(audioService: widget.audioService),
                         ));
