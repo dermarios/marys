@@ -317,6 +317,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     _linhaTop(i),
                     if (i < _top.length - 1) const SizedBox(height: 8),
                   ],
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
