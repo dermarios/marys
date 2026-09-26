@@ -262,12 +262,12 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   _controles(),
                   const SizedBox(height: 16),
                   _listaFaixas(),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 24),
                   if (widget.expandido)
                     ...cardsPlayerExpandido(context, widget.audioService)
                   else ...[
                     ClipeCard(conteudo: conteudoDoAlbum(widget.audioService.currentAlbum?.id), titulo: track?.title ?? ''),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 24),
                     for (final a in kAlbuns) ...[
                       AlbumSpotifyCard(album: a),
                       const SizedBox(height: 10),
