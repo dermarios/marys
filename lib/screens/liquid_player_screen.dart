@@ -190,6 +190,9 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
   void initState() {
     super.initState();
     _blobs = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
+    if (widget.expandido) {
+      widget.audioService.setPlayerExpanded(true);
+    }
     _load();
   }
 
@@ -206,6 +209,9 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
 
   @override
   void dispose() {
+    if (widget.expandido) {
+      widget.audioService.setPlayerExpanded(false);
+    }
     _blobs.dispose();
     super.dispose();
   }

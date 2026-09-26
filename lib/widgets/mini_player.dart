@@ -51,11 +51,16 @@ class MiniPlayer extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: ListenableBuilder(
-        listenable: Listenable.merge(
-            [audioService.currentTrackNotifier, audioService.currentAlbumNotifier]),
+        listenable: Listenable.merge([
+          audioService.currentTrackNotifier,
+          audioService.currentAlbumNotifier,
+          audioService.playerExpandedNotifier,
+        ]),
         builder: (context, _) {
           final track = audioService.currentTrack;
-          if (track == null) return const SizedBox.shrink();
+          if (track == null || audioService.playerExpandedNotifier.value) {
+            return const SizedBox.shrink();
+          }
           return StreamBuilder<PlayerState>(
             stream: _p.playerStateStream,
             builder: (context, snap) {

@@ -24,6 +24,7 @@ class PittyAudioService {
 
   late final ValueNotifier<Track?> currentTrackNotifier;
   late final ValueNotifier<Album?> currentAlbumNotifier;
+  late final ValueNotifier<bool> playerExpandedNotifier;
 
   final _opQueue = <Future<void> Function()>[];
   bool _emExecucao = false;
@@ -32,6 +33,7 @@ class PittyAudioService {
     _player = _audioHandler.player;
     currentTrackNotifier = ValueNotifier<Track?>(null);
     currentAlbumNotifier = ValueNotifier<Album?>(null);
+    playerExpandedNotifier = ValueNotifier<bool>(false);
     _initializeAudioSession().ignore();
     _setupCurrentTrackListener();
   }
@@ -256,10 +258,15 @@ class PittyAudioService {
     }
   }
 
+  void setPlayerExpanded(bool expanded) {
+    playerExpandedNotifier.value = expanded;
+  }
+
   void dispose() {
     _currentIndexSubscription?.cancel();
     currentTrackNotifier.dispose();
     currentAlbumNotifier.dispose();
+    playerExpandedNotifier.dispose();
     _player.dispose();
   }
 }
