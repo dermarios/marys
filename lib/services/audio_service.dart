@@ -36,58 +36,28 @@ class PittyAudioService {
     _tracks = [];
     final hardcodedTracks = [
       Track(
-        path: 'assets/musicas/01 - Teto De Vidro.mp3',
-        title: 'Teto De Vidro',
+        path: 'assets/musicas/01 -  Leprechaun.mp3',
+        title: 'Leprechaun',
         imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
       ),
       Track(
-        path: 'assets/musicas/02 - Admiravel Chip Novo.mp3',
-        title: 'Admirável Chip Novo',
+        path: 'assets/musicas/02 - Cocaine Bread.mp3',
+        title: 'Cocaine Bread',
         imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
       ),
       Track(
-        path: 'assets/musicas/03 - Mascara.mp3',
-        title: 'Máscara',
+        path: 'assets/musicas/03 - Forbidden Tree.mp3',
+        title: 'Forbidden Tree',
         imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
       ),
       Track(
-        path: 'assets/musicas/04 - Equalize.mp3',
-        title: 'Equalize',
+        path: 'assets/musicas/04 - Mary\'s Secret Box.mp3',
+        title: 'Mary\'s Secret Box',
         imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
       ),
       Track(
-        path: 'assets/musicas/05 - O Lobo.mp3',
-        title: 'O Lobo',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/06 - Emboscada.mp3',
-        title: 'Emboscada',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/07 - Do Mesmo Lado.mp3',
-        title: 'Do Mesmo Lado',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/08 - Temporal.mp3',
-        title: 'Temporal',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/09 - So De Passagem.mp3',
-        title: 'Só De Passagem',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/10 - I Wanna Be.mp3',
-        title: 'I Wanna Be',
-        imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
-      ),
-      Track(
-        path: 'assets/musicas/11 - Semana Que Vem.mp3',
-        title: 'Semana Que Vem',
+        path: 'assets/musicas/05 - Silent Sky.mp3',
+        title: 'Silent Sky',
         imageAsset: 'assets/Jorge-Daux-@jorgedaux.webp',
       ),
     ];
