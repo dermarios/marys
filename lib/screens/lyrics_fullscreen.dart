@@ -224,8 +224,8 @@ class _LyricsFullscreenState extends State<LyricsFullscreen>
                 ),
               ),
               IconButton(
-                onPressed: () async {
-                  await _s.previous();
+                onPressed: () {
+                  _s.previous();
                   if (mounted) setState(() {});
                 },
                 icon: const Icon(Icons.skip_previous_rounded, color: Colors.white),
@@ -251,8 +251,8 @@ class _LyricsFullscreenState extends State<LyricsFullscreen>
                 },
               ),
               IconButton(
-                onPressed: () async {
-                  await _s.next();
+                onPressed: () {
+                  _s.next();
                   if (mounted) setState(() {});
                 },
                 icon: const Icon(Icons.skip_next_rounded, color: Colors.white),
