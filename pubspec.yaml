@@ -44,9 +44,8 @@ flutter:
   assets:
     - assets/musicas/
     - assets/Jorge-Daux-@jorgedaux.webp
-    - assets/IMAGEM_NOTICIA_original.jpg
-    - assets/775416812_18620508076026296_1192558196502584496_n.jpg
-    - assets/775245305_18620508094026296_8409613848889249192_n.jpg
+    - assets/capa-fundo.png
+    - assets/a4167869092_1x1_700.avif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

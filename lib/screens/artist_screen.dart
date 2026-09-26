@@ -31,7 +31,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   final GlassMode _mode = GlassMode.fosco;
   bool _curtido = false;
 
-  static const _foto = 'assets/775245305_18620508094026296_8409613848889249192_n.jpg';
+  static const _foto = 'assets/capa-fundo.png';
 
   /// Agenda — substitua pelos shows reais.
   static const _shows = [
