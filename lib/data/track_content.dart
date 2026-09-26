@@ -32,7 +32,15 @@ const _letraExemplo = <String>[
 
 /// Chave = Track.title (como aparece no tracks.json).
 const kConteudo = <String, ConteudoFaixa>{
-  'Until the Day You Be Born': ConteudoFaixa(
+  // 'I see in the crowd': ConteudoFaixa(letra: [...], clipeYoutubeId: 'XXXXXXXXXXX'),
+};
+
+ConteudoFaixa conteudoDe(Track? t) =>
+    (t == null ? null : kConteudo[t.title]) ?? const ConteudoFaixa(letra: _letraExemplo);
+
+/// Retorna o conteúdo (vídeo) do álbum. Independente da faixa atual.
+const kConteudoAlbuns = <String, ConteudoFaixa>{
+  'just': ConteudoFaixa(
     letra: _letraExemplo,
     clipeYoutubeId: 'XMaYPNlArYA',
     clipeLabel: 'STUDIO SESSIONS',
@@ -40,8 +48,9 @@ const kConteudo = <String, ConteudoFaixa>{
   ),
 };
 
-ConteudoFaixa conteudoDe(Track? t) =>
-    (t == null ? null : kConteudo[t.title]) ?? const ConteudoFaixa(letra: _letraExemplo);
+ConteudoFaixa conteudoDoAlbum(String? albumId) =>
+    (albumId == null ? null : kConteudoAlbuns[albumId.toLowerCase()]) ??
+    const ConteudoFaixa(letra: _letraExemplo);
 
 class AlbumSpotify {
   final String nome;
