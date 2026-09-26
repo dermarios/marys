@@ -16,27 +16,35 @@ class PlayerShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(child: child),
-        Positioned(
-          left: 10,
-          right: 10,
-          bottom: MediaQuery.of(context).padding.bottom + 8,
-          child: MiniPlayer(audioService: audioService),
-        ),
-        if (audioService.currentTrack != null)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: MediaQuery.of(context).padding.bottom + 8 + 64 - 8,
-            child: Center(
-              child: BotaoExpandir(
-                onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
-              ),
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        audioService.currentTrackNotifier,
+        audioService.playerExpandedNotifier,
+      ]),
+      builder: (context, _) {
+        return Stack(
+          children: [
+            Positioned.fill(child: child),
+            Positioned(
+              left: 10,
+              right: 10,
+              bottom: MediaQuery.of(context).padding.bottom + 8,
+              child: MiniPlayer(audioService: audioService),
             ),
-          ),
-      ],
+            if (audioService.currentTrack != null && !audioService.playerExpandedNotifier.value)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: MediaQuery.of(context).padding.bottom + 8 + 64 - 8,
+                child: Center(
+                  child: BotaoExpandir(
+                    onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
