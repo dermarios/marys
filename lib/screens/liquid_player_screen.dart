@@ -306,7 +306,7 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
               Text(albumTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.white)),
+                  style: const TextStyle(fontSize: 14, color: Colors.white)),
             ],
           ),
         ),
