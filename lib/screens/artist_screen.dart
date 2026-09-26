@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/models/album.dart';
+import 'package:msb_just/models/track.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
 
@@ -28,14 +29,13 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
 
   static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
 
-  /// Mais tocadas — valores de exemplo. Se o título existir em tracks.json,
-  /// o toque toca a faixa local.
+  /// Mais tocadas — títulos reais das faixas disponíveis
   static const _top = [
-    (titulo: 'Máscara', plays: '2,4 mi', dur: '4:03'),
-    (titulo: 'Equalize', plays: '1,9 mi', dur: '4:44'),
-    (titulo: 'Teto de Vidro', plays: '1,3 mi', dur: '3:52'),
-    (titulo: 'Na Sua Estante', plays: '980 mil', dur: '4:12'),
-    (titulo: 'Memórias', plays: '720 mil', dur: '3:41'),
+    (titulo: 'Until the Day You Be Born', plays: '2,4 mi', dur: '4:03'),
+    (titulo: 'Weird', plays: '1,9 mi', dur: '4:44'),
+    (titulo: 'Beyond Smoke', plays: '1,3 mi', dur: '3:52'),
+    (titulo: 'Corruption Messiah', plays: '980 mil', dur: '4:12'),
+    (titulo: 'Absinto', plays: '720 mil', dur: '3:41'),
   ];
 
   @override
@@ -343,18 +343,48 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
         ],
       );
 
-  void _tocarPorTitulo(String titulo, {bool album = false}) {
+  void _tocarPorTitulo(String titulo) {
     final s = widget.audioService;
-    final alvo = s.tracks.where((t) => t.title.toLowerCase() == titulo.toLowerCase());
-    if (alvo.isEmpty) return;
 
-    s.play(alvo.first).then((_) {
-      if (mounted) setState(() {});
-    }).catchError((e) {
-      print('Erro ao tocar $titulo: $e');
-    });
+    // Procura a faixa em todos os álbuns
+    Track? faixaEncontrada;
+    Album? albumDaFaixa;
 
-    if (album) _abrirPlayer();
+    for (var alb in kAlbums) {
+      final encontrada = alb.tracks.where((t) => t.title.toLowerCase() == titulo.toLowerCase());
+      if (encontrada.isNotEmpty) {
+        faixaEncontrada = encontrada.first;
+        albumDaFaixa = alb;
+        break;
+      }
+    }
+
+    if (faixaEncontrada == null || albumDaFaixa == null) {
+      print('Faixa não encontrada: $titulo');
+      return;
+    }
+
+    // Se a faixa está em um álbum diferente, carrega esse álbum
+    if (s.currentAlbum?.id != albumDaFaixa.id) {
+      s.playAlbum(albumDaFaixa).then((_) {
+        if (mounted) {
+          setState(() {});
+          _abrirPlayer();
+        }
+      }).catchError((e) {
+        print('Erro ao carregar álbum: $e');
+      });
+    } else {
+      // Se está no mesmo álbum, apenas toca
+      s.play(faixaEncontrada).then((_) {
+        if (mounted) {
+          setState(() {});
+          _abrirPlayer();
+        }
+      }).catchError((e) {
+        print('Erro ao tocar $titulo: $e');
+      });
+    }
   }
 
   // Mais tocadas: um card de vidro por faixa, sem capa colorida.
