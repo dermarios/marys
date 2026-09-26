@@ -31,19 +31,6 @@ class PlayerShell extends StatelessWidget {
               bottom: MediaQuery.of(context).padding.bottom + 8,
               child: MiniPlayer(audioService: audioService),
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: MediaQuery.of(context).padding.bottom + 64,
-              child: SizedBox(
-                height: 50,
-                child: Center(
-                  child: BotaoExpandir(
-                    onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
-                  ),
-                ),
-              ),
-            ),
           ],
         );
       },
@@ -173,6 +160,16 @@ class MiniPlayer extends StatelessWidget {
                             ),
                           );
                         },
+                      ),
+                    ),
+                    Positioned(
+                      top: -20,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: BotaoExpandir(
+                          onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                        ),
                       ),
                     ),
                   ],
