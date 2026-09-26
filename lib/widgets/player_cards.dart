@@ -229,27 +229,54 @@ class AlbumSpotifyCard extends StatelessWidget {
   final AlbumSpotify album;
   const AlbumSpotifyCard({super.key, required this.album});
 
+  Map<String, dynamic> _infoServico() {
+    switch (album.servico) {
+      case ServicoStreaming.spotify:
+        return {
+          'nome': 'Spotify',
+          'logo': 'assets/Spotify_Primary_Logo_RGB_Green.png',
+          'cor': const Color(0xFF1ED760),
+          'tinta': Colors.black,
+          'subtitulo': 'Abrir álbum no Spotify',
+          'acao': () => abrirSpotifyAlbum(album.spotifyId),
+        };
+      case ServicoStreaming.appleMusic:
+        return {
+          'nome': 'Apple Music',
+          'logo': 'assets/Apple_Music_icon.svg.webp',
+          'cor': const Color(0xFFFA2D48),
+          'tinta': Colors.white,
+          'subtitulo': 'Abrir álbum no Apple Music',
+          'acao': () => abrirLink(linkAppleMusic(album.nome)),
+        };
+      case ServicoStreaming.deezer:
+        return {
+          'nome': 'Deezer',
+          'logo': 'assets/deezer-rounded-logo-design-free-png.webp',
+          'cor': const Color(0xFFA238FF),
+          'tinta': Colors.white,
+          'subtitulo': 'Abrir álbum no Deezer',
+          'acao': () => abrirLink(linkDeezer(album.nome)),
+        };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final info = _infoServico();
     return GestureDetector(
-      onTap: () => abrirSpotifyAlbum(album.spotifyId),
+      onTap: info['acao'] as VoidCallback,
       child: _LinhaServico(
-        leading: Container(
+        leading: Image.asset(
+          info['logo'] as String,
           width: 52,
           height: 52,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(13),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: kPaletas[album.paleta % kPaletas.length],
-            ),
-          ),
+          fit: BoxFit.contain,
         ),
         titulo: album.nome,
-        subtitulo: 'Abrir álbum no Spotify',
-        cor: const Color(0xFF1ED760),
-        tinta: Colors.black,
+        subtitulo: info['subtitulo'] as String,
+        cor: info['cor'] as Color,
+        tinta: info['tinta'] as Color,
       ),
     );
   }

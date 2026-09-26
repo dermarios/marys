@@ -58,11 +58,14 @@ ConteudoFaixa conteudoDoAlbum(String? albumId) =>
     (albumId == null ? null : kConteudoAlbuns[albumId.toLowerCase()]) ??
     const ConteudoFaixa(letra: _letraExemplo);
 
+enum ServicoStreaming { spotify, appleMusic, deezer }
+
 class AlbumSpotify {
   final String nome;
   final String spotifyId;
   final int paleta; // índice em kPaletas
-  const AlbumSpotify(this.nome, this.spotifyId, this.paleta);
+  final ServicoStreaming servico;
+  const AlbumSpotify(this.nome, this.spotifyId, this.paleta, {this.servico = ServicoStreaming.spotify});
 }
 
 const kAlbuns = <AlbumSpotify>[
@@ -74,19 +77,19 @@ const kAlbuns = <AlbumSpotify>[
 /// Cards de álbuns relacionados por álbum. Configurável pelo desenvolvedor.
 const kAlbunsRelacionados = <String, List<AlbumSpotify>>{
   'just': <AlbumSpotify>[
-    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
-    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
-    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0, servico: ServicoStreaming.spotify),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1, servico: ServicoStreaming.appleMusic),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
   ],
   'beyond-smoke': <AlbumSpotify>[
-    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
-    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
-    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0, servico: ServicoStreaming.spotify),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1, servico: ServicoStreaming.appleMusic),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
   ],
   'escravos-do-tempo': <AlbumSpotify>[
-    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0),
-    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1),
-    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2),
+    AlbumSpotify('Admirável Chip Novo', 'ALBUM_ID_1', 0, servico: ServicoStreaming.spotify),
+    AlbumSpotify('Anacrônico', 'ALBUM_ID_2', 1, servico: ServicoStreaming.appleMusic),
+    AlbumSpotify('Chiaroscuro', 'ALBUM_ID_3', 2, servico: ServicoStreaming.deezer),
   ],
 };
 
