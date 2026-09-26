@@ -35,10 +35,13 @@ class PlayerShell extends StatelessWidget {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: MediaQuery.of(context).padding.bottom + 72,
-                child: Center(
-                  child: BotaoExpandir(
-                    onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                bottom: MediaQuery.of(context).padding.bottom + 64,
+                child: SizedBox(
+                  height: 50,
+                  child: Center(
+                    child: BotaoExpandir(
+                      onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                    ),
                   ),
                 ),
               ),
@@ -208,15 +211,11 @@ class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    print('🔵 BotaoExpandir está sendo renderizado');
     return Semantics(
       button: true,
       label: 'Expandir player',
       child: GestureDetector(
-        onTap: () {
-          print('🔴 BotaoExpandir foi tocado');
-          widget.onTap();
-        },
+        onTap: widget.onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -228,9 +227,9 @@ class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProvider
                 width: 36,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF14121E).withOpacity(0.62),
+                  color: const Color(0xFF14121E).withOpacity(0.72),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white.withOpacity(0.28)),
+                  border: Border.all(color: Colors.white.withOpacity(0.35)),
                   boxShadow: [
                     BoxShadow(
                         color: Colors.black.withOpacity(0.35),
