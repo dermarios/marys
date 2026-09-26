@@ -543,79 +543,83 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                   style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)))
           : Builder(
               // sem rolagem própria: a altura acompanha a quantidade de faixas
-              builder: (_) => ListView.builder(
+              builder: (_) => ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 itemCount: tracks.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (_, i) {
                   final t = tracks[i];
                   final atual = t == widget.audioService.currentTrack;
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      widget.audioService.play(t);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 1),
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: atual ? Colors.white.withOpacity(0.12) : Colors.transparent,
-                      ),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 19,
-                            child: Text(
-                              (todas.indexOf(t) + 1).toString().padLeft(2, '0'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(atual ? 1 : 0.5)),
-                            ),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        widget.audioService.play(t);
+                      },
+                      child: Stack(
+                      children: [
+                        Glass(
+                          mode: _mode,
+                          radius: 20,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                child: Text(
+                                  (todas.indexOf(t) + 1).toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white.withOpacity(atual ? 1 : 0.55)),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(t.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            fontSize: 14.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white)),
+                                    Text('Mary\'s Secret Box',
+                                        style: TextStyle(
+                                            fontSize: 11, color: Colors.white.withOpacity(0.62))),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                t.duration == Duration.zero ? '' : _fmt(t.duration),
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.58)),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 11),
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: kPaletas[i % kPaletas.length].take(2).toList(),
+                        ),
+                        // faixa atual: contorno claro por cima do vidro
+                        if (atual)
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withOpacity(0.5)),
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 11),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white.withOpacity(atual ? 1 : 0.88))),
-                                Text('Pitty',
-                                    style: TextStyle(
-                                        fontSize: 11, color: Colors.white.withOpacity(0.6))),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            t.duration == Duration.zero ? '' : _fmt(t.duration),
-                            style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.55)),
-                          ),
-                        ],
-                      ),
+                      ],
+                    ),
                     ),
                   );
                 },
