@@ -46,6 +46,12 @@ const kConteudoAlbuns = <String, ConteudoFaixa>{
     clipeLabel: 'STUDIO SESSIONS',
     clipeTitulo: 'Until the Day You Be Born',
   ),
+  'beyond-smoke': ConteudoFaixa(
+    letra: _letraExemplo,
+    clipeYoutubeId: 'v_RNStDxtzo',
+    clipeLabel: 'CLIPE OFICIAL',
+    clipeTitulo: 'Beyond Smoke',
+  ),
 };
 
 ConteudoFaixa conteudoDoAlbum(String? albumId) =>
