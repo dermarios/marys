@@ -579,14 +579,17 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                         children: [
                           SizedBox(
                             width: 20,
-                            child: Text(
-                              (todas.indexOf(t) + 1).toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(atual ? 1 : 0.55)),
-                            ),
+                            child: atual
+                                ? Icon(Icons.music_note_rounded,
+                                    size: 16, color: Colors.white.withOpacity(0.9))
+                                : Text(
+                                    (todas.indexOf(t) + 1).toString(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.55)),
+                                  ),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -606,12 +609,16 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                               ],
                             ),
                           ),
-                          Text(
-                            t.duration == Duration.zero ? '' : _fmt(t.duration),
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.58)),
+                          SizedBox(
+                            width: 50,
+                            child: Text(
+                              t.duration == Duration.zero ? '' : _fmt(t.duration),
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.58)),
+                            ),
                           ),
                         ],
                       ),
