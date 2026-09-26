@@ -11,7 +11,14 @@ const kBioArtista =
 class ConteudoFaixa {
   final List<String> letra;
   final String? clipeYoutubeId;
-  const ConteudoFaixa({required this.letra, this.clipeYoutubeId});
+  final String clipeLabel;
+  final String? clipeTitulo;
+  const ConteudoFaixa({
+    required this.letra,
+    this.clipeYoutubeId,
+    this.clipeLabel = 'CLIPE OFICIAL',
+    this.clipeTitulo,
+  });
 }
 
 const _letraExemplo = <String>[
@@ -31,7 +38,12 @@ const kConteudo = <String, ConteudoFaixa>{
   'Weird': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
   'Suicide Playground': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
   'Carry Me to Chaos': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
-  'Until the Day You Be Born': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
+  'Until the Day You Be Born': ConteudoFaixa(
+    letra: _letraExemplo,
+    clipeYoutubeId: 'XMaYPNlArYA',
+    clipeLabel: 'STUDIO SESSIONS',
+    clipeTitulo: 'Until the Day You Be Born',
+  ),
   'Corruption Messiah': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
   'Forbidden Tree': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),
   'Cocaine Bread': ConteudoFaixa(letra: _letraExemplo, clipeYoutubeId: 'XMaYPNlArYA'),

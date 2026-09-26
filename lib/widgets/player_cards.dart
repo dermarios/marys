@@ -205,11 +205,11 @@ class ClipeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('CLIPE OFICIAL',
+                Text(conteudo.clipeLabel,
                     style: TextStyle(
                         fontSize: 9, letterSpacing: 1.8, color: Colors.white.withOpacity(0.6))),
                 const SizedBox(height: 4),
-                Text(titulo,
+                Text(conteudo.clipeTitulo ?? titulo,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
