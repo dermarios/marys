@@ -603,7 +603,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
     final topo = MediaQuery.of(context).padding.top + 8 + 38 + 8;
     return Positioned.fill(
       child: IgnorePointer(
-        ignoring: !_menuAberto,
+        ignoring: false,
         child: Stack(
           children: [
             // fundo: toque fora fecha
