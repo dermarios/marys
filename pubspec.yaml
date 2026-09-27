@@ -55,6 +55,7 @@ flutter:
     - assets/Spotify_Primary_Logo_RGB_Green.png
     - assets/Apple_Music_icon.svg.webp
     - assets/deezer-rounded-logo-design-free-png.webp
+    - assets/app-icon.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
