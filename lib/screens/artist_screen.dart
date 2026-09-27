@@ -584,6 +584,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
 
   Widget _menuContexto() {
     const itens = [
+      ('Estante', Icons.library_music_rounded),
       ('Sobre', Icons.info_outline_rounded),
       ('Direitos Autorais', Icons.copyright_rounded),
       ('Ajuda', Icons.help_outline_rounded),
@@ -691,6 +692,9 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
 
   void _abrirItem(String rotulo) {
     switch (rotulo) {
+      case 'Estante':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => LibraryScreen(audioService: widget.audioService)));
+        break;
       case 'Sobre':
         Navigator.push(context, MaterialPageRoute(builder: (_) => CreditsScreen(audioService: widget.audioService)));
         break;
