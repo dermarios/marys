@@ -280,7 +280,6 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                         MaterialPageRoute(
                           builder: (_) => GalleryScreen(
                             audioService: widget.audioService,
-                            albumId: widget.audioService.currentAlbum?.id,
                           ),
                         ),
                       ),
