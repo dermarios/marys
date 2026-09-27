@@ -274,7 +274,7 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: const Color(0xFF0A0910), width: 2),
-                      image: const DecorationImage(image: AssetImage(_f1), fit: BoxFit.cover),
+                      image: DecorationImage(image: AssetImage(widget.audioService.currentAlbum?.coverAsset ?? _f1), fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -283,7 +283,7 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('pitty',
+                      const Text("Mary's Secret Box",
                           style: TextStyle(
                               fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                       Text(p.local,
@@ -352,44 +352,12 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
             ),
           ),
 
-          // ações
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
-            child: Row(
-              children: [
-                _acao(
-                  AnimatedScale(
-                    duration: const Duration(milliseconds: 180),
-                    curve: Curves.easeOutBack,
-                    scale: curtido ? 1.1 : 1,
-                    child: Icon(curtido ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        size: 23, color: Colors.white),
-                  ),
-                  () => _curtir(p),
-                ),
-                _acao(const Icon(Icons.chat_bubble_outline_rounded, size: 21, color: Colors.white),
-                    () {}),
-                _acao(const Icon(Icons.send_outlined, size: 21, color: Colors.white), () {}),
-                const Spacer(),
-                _acao(
-                  Icon(salvo ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                      size: 22, color: Colors.white),
-                  () => setState(() => salvo ? _salvos.remove(p.id) : _salvos.add(p.id)),
-                ),
-              ],
-            ),
-          ),
-
           // texto
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 2, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${_fmt(p.curtidas + (curtido ? 1 : 0))} curtidas',
-                    style: const TextStyle(
-                        fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white)),
-                const SizedBox(height: 8),
                 Text(p.titulo,
                     style: const TextStyle(
                         fontSize: 17,
