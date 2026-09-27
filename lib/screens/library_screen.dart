@@ -29,18 +29,11 @@ class Lancamento {
   const Lancamento(this.titulo, this.ano, this.tipo, this.categoria, {this.capa});
 }
 
-/// Discografia — EXEMPLO. Confira títulos, anos e tipos e aponte as capas reais.
+/// Discografia — Álbuns reais disponíveis no app
 const kDiscografia = <Lancamento>[
-  Lancamento('Admirável Chip Novo', '2003', 'Álbum', TipoLancamento.album),
-  Lancamento('Anacrônico', '2005', 'Álbum', TipoLancamento.album),
-  Lancamento('Chiaroscuro', '2009', 'Álbum', TipoLancamento.album),
-  Lancamento('SETEVIDAS', '2014', 'Álbum', TipoLancamento.album),
-  Lancamento('Matriz', '2019', 'Álbum', TipoLancamento.album),
-  Lancamento('Máscara', '2003', 'Single', TipoLancamento.singleEp),
-  Lancamento('Equalize', '2005', 'Single', TipoLancamento.singleEp),
-  Lancamento('Teto de Vidro', '2009', 'EP', TipoLancamento.singleEp),
-  Lancamento('{Des}Concerto Ao Vivo', '2007', 'Ao vivo', TipoLancamento.compilacao),
-  Lancamento('Grandes Sucessos', '2016', 'Coletânea', TipoLancamento.compilacao),
+  Lancamento('Beyond Smoke', '2020', 'Álbum', TipoLancamento.album),
+  Lancamento('Escravos do Tempo\nContinuo e Lento', '2021', 'Álbum', TipoLancamento.album),
+  Lancamento('Just', '2024', 'Álbum', TipoLancamento.album),
 ];
 
 class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProviderStateMixin {
