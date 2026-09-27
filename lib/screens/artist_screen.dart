@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/models/album.dart';
 import 'package:msb_just/models/track.dart';
+import 'package:msb_just/data/track_content.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
 
@@ -369,6 +370,42 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                 style: TextStyle(fontSize: 12.5, height: 1.5, color: Colors.white.withOpacity(0.75)),
                               ),
                             ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => abrirLink('https://www.phonolite.com.br'),
+                            child: Text(
+                              'Powered by - Phonolite\nGestão de Acervos Musicais',
+                              style: TextStyle(
+                                fontSize: 10,
+                                height: 1.3,
+                                color: Colors.white.withOpacity(0.55),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => abrirLink('https://www.forven.com.br'),
+                            child: Text(
+                              'Designed by ®Forven\nTecnologia',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 10,
+                                height: 1.3,
+                                color: Colors.white.withOpacity(0.55),
+                              ),
+                            ),
                           ),
                         ),
                       ],
