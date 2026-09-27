@@ -80,7 +80,7 @@ class _PlayerShellState extends State<PlayerShell> with TickerProviderStateMixin
     const pts = [0.0, -12.0, 0.0, -5.0, 0.0];
     final seg = (t * 4).clamp(0, 3.999);
     final i = seg.floor();
-    final f = Curves.easeOut.transform(seg - i);
+    final f = Curves.easeOut.transform((seg - i).toDouble());
     return pts[i] + (pts[i + 1] - pts[i]) * f;
   }
 
