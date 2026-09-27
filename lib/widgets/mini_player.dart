@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'package:msb_just/screens/liquid_player_screen.dart';
-import 'package:msb_just/services/audio_service.dart';
+import 'package:maryssecretbox/screens/liquid_player_screen.dart';
+import 'package:maryssecretbox/services/audio_service.dart';
 
 /// Envolve qualquer tela e coloca o player flutuante no rodapé.
 ///

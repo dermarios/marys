@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:msb_just/data/track_content.dart';
-import 'package:msb_just/screens/liquid_player_screen.dart';
-import 'package:msb_just/screens/lyrics_fullscreen.dart';
-import 'package:msb_just/services/audio_service.dart';
+import 'package:maryssecretbox/data/track_content.dart';
+import 'package:maryssecretbox/screens/liquid_player_screen.dart';
+import 'package:maryssecretbox/screens/lyrics_fullscreen.dart';
+import 'package:maryssecretbox/services/audio_service.dart';
 
 const _mode = GlassMode.fosco;
 

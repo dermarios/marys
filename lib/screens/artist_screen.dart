@@ -4,10 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:msb_just/services/audio_service.dart';
-import 'package:msb_just/models/album.dart';
-import 'package:msb_just/models/track.dart';
-import 'package:msb_just/data/track_content.dart';
+import 'package:maryssecretbox/services/audio_service.dart';
+import 'package:maryssecretbox/models/album.dart';
+import 'package:maryssecretbox/models/track.dart';
+import 'package:maryssecretbox/data/track_content.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
 import 'credits_screen.dart';

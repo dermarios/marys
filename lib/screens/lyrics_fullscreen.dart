@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'package:msb_just/data/track_content.dart';
-import 'package:msb_just/services/audio_service.dart';
-import 'package:msb_just/widgets/player_cards.dart';
+import 'package:maryssecretbox/data/track_content.dart';
+import 'package:maryssecretbox/services/audio_service.dart';
+import 'package:maryssecretbox/widgets/player_cards.dart';
 import 'liquid_player_screen.dart';
 
 /// Letra em tela cheia com mini controle da faixa atual.

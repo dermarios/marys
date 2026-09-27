@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'package:msb_just/data/track_content.dart';
-import 'package:msb_just/models/track.dart';
-import 'package:msb_just/services/audio_service.dart';
-import 'package:msb_just/widgets/player_cards.dart';
-import 'package:msb_just/widgets/mini_player.dart';
+import 'package:maryssecretbox/data/track_content.dart';
+import 'package:maryssecretbox/models/track.dart';
+import 'package:maryssecretbox/services/audio_service.dart';
+import 'package:maryssecretbox/widgets/player_cards.dart';
+import 'package:maryssecretbox/widgets/mini_player.dart';
 import 'gallery_screen.dart';
 
 /// Tela "Tocando agora" — conceito Liquid Glass.

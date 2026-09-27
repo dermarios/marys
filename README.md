@@ -1,4 +1,4 @@
-# Pitty Player
+# Mary`s Secret Box Player
 
 Um app Flutter para reproduzir arquivos MP3 armazenados nos assets do app, 100% offline.
 

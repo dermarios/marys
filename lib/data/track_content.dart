@@ -1,5 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
-import 'package:msb_just/models/track.dart';
+import 'package:maryssecretbox/models/track.dart';
 
 /// Conteúdo editorial das faixas. Tudo aqui é EXEMPLO — troque pelos dados reais.
 
