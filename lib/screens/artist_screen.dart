@@ -175,20 +175,8 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           child: SizedBox(
                             width: 38,
                             height: 38,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                if (_menuAberto)
-                                  DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.5),
-                                    ),
-                                  ),
-                                Icon(Icons.menu_rounded,
-                                    size: 22, color: Colors.white.withOpacity(0.9)),
-                              ],
-                            ),
+                            child: Icon(Icons.sort_rounded,
+                                size: 20, color: Colors.white.withOpacity(0.9)),
                           ),
                         ),
                       ),
