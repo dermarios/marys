@@ -5,12 +5,14 @@ class Album {
   final String title;
   final String coverAsset;
   final List<Track> tracks;
+  final int year;
 
   Album({
     required this.id,
     required this.title,
     required this.coverAsset,
     required this.tracks,
+    required this.year,
   });
 }
 
@@ -19,6 +21,7 @@ final kAlbums = [
     id: 'beyond-smoke',
     title: 'Beyond Smoke',
     coverAsset: 'assets/albuns/beyond-smolke/a2940860726_1x1_700.avif',
+    year: 2020,
     tracks: [
       Track(
         path: 'assets/albuns/beyond-smolke/01 - Beyond Smoke.mp3',
@@ -31,6 +34,7 @@ final kAlbums = [
     id: 'escravos-do-tempo',
     title: 'Escravos do Tempo\nContinuo e Lento',
     coverAsset: 'assets/albuns/escravos-do-tempo-continuo-e-lento/51Lw+X7jACL._UXNaN_FMjpg_QL85_.jpg',
+    year: 2021,
     tracks: [
       Track(
         path: 'assets/albuns/escravos-do-tempo-continuo-e-lento/01 - A Temperança.mp3',
@@ -63,6 +67,7 @@ final kAlbums = [
     id: 'just',
     title: 'Just',
     coverAsset: 'assets/albuns/just/Jorge-Daux-@jorgedaux.webp',
+    year: 2024,
     tracks: [
       Track(
         path: 'assets/albuns/just/01 - Leprechaun.mp3',
