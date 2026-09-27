@@ -1,10 +1,53 @@
-import 'package:flutter/material.dart';
+import 'dart:ui' show FontFeature;
 
-import 'package:msb_just/services/audio_service.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../services/audio_service.dart';
 import 'liquid_player_screen.dart';
 
-/// Créditos da obra — produção, composição, banda, fotografia e arte.
-/// Substitua a constante `kCreditos` pelos créditos reais.
+/// Créditos do app: Versão, Reprodutor de áudio, Phonolite e Tecnologia.
+///
+/// O mini player vem do PlayerShell:
+///   PlayerShell(audioService: s, child: CreditsScreen(audioService: s))
+///
+/// Valores de EXEMPLO — confirme no pubspec.yaml.
+class AppInfo {
+  static const nome = "Mary's Secret Box";
+  static const empresa = 'Phonolite';
+  static const versao = '1.0.0';
+  static const build = '1';
+  static const canal = 'Produção';
+  static const plataforma = 'iOS';
+}
+
+const kAudioInfo = <(String, String)>[
+  ('Motor', 'just_audio'),
+  ('Versão', '0.9.x'),
+  ('Formatos', 'MP3'),
+  ('Reprodução', 'Offline · arquivos locais'),
+  ('Sessão de áudio', 'Segundo plano'),
+];
+
+class PhonoliteInfo {
+  static const descricao =
+      'Texto de exemplo sobre a Phonolite e seu papel no app — substitua pela descrição oficial.';
+  static const url = 'https://example.com';
+  static const linhas = <(String, String)>[
+    ('Papel', 'A definir'),
+    ('Versão', '—'),
+  ];
+}
+
+const kTecnologias = <(String nome, String papel, String versao, String marca)>[
+  ('Flutter', 'Framework de interface', '3.x', 'F'),
+  ('Dart', 'Linguagem', '3.x', 'D'),
+  ('just_audio', 'Reprodução de áudio', '0.9.x', 'ja'),
+  ('url_launcher', 'Links para Spotify, Apple Music e Deezer', '6.x', 'ul'),
+  ('shared_preferences', 'Preferências locais', '2.x', 'sp'),
+  ('Liquid Glass', 'BackdropFilter + blend modes', '—', 'LG'),
+];
+
 class CreditsScreen extends StatefulWidget {
   final AudioService audioService;
   const CreditsScreen({super.key, required this.audioService});
@@ -13,45 +56,12 @@ class CreditsScreen extends StatefulWidget {
   State<CreditsScreen> createState() => _CreditsScreenState();
 }
 
-class _Secao {
-  final String titulo;
-  final List<(String nome, String funcao)> pessoas;
-  const _Secao(this.titulo, this.pessoas);
-}
-
-const kCreditos = <_Secao>[
-  _Secao('Composição', [
-    ('Ana Ferraz', 'Letra e melodia'),
-    ('Rui Almeida', 'Melodia · arranjo de cordas'),
-  ]),
-  _Secao('Produção', [
-    ('Marcelo Tavares', 'Produção musical'),
-    ('Bia Nogueira', 'Produção executiva'),
-  ]),
-  _Secao('Estúdio', [
-    ('Caio Ribeiro', 'Engenharia de gravação'),
-    ('Helena Prado', 'Mixagem'),
-    ('Sérgio Lund', 'Masterização'),
-  ]),
-  _Secao('Banda', [
-    ('Mary\'s Secret Box', 'Voz e guitarra base'),
-    ('Duda Machado', 'Guitarra solo'),
-    ('Joana Alves', 'Baixo'),
-    ('Téo Barreto', 'Bateria'),
-  ]),
-  _Secao('Fotografia', [
-    ('Jorge Daux', 'Fotografia de capa e turnê'),
-    ('Lia Sampaio', 'Bastidores'),
-  ]),
-  _Secao('Arte e design', [
-    ('Estúdio Vidro', 'Direção de arte'),
-    ('Nuno Peixoto', 'Design da identidade'),
-  ]),
-];
+enum _Atualizacao { parado, verificando, ok }
 
 class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
+  _Atualizacao _upd = _Atualizacao.parado;
 
   @override
   void initState() {
@@ -65,33 +75,37 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
     super.dispose();
   }
 
-  String _iniciais(String nome) {
-    final partes = nome.trim().split(RegExp(r'\s+'));
-    return partes.take(2).map((p) => p[0].toUpperCase()).join();
+  /// Troque pela checagem real (App Store / backend).
+  Future<void> _verificarAtualizacao() async {
+    if (_upd == _Atualizacao.verificando) return;
+    setState(() => _upd = _Atualizacao.verificando);
+    await Future.delayed(const Duration(milliseconds: 1200));
+    if (mounted) setState(() => _upd = _Atualizacao.ok);
   }
 
   @override
   Widget build(BuildContext context) {
-    final faixa = widget.audioService.currentTrack;
-
+    final paleta = kPaletas[0];
     return Scaffold(
       backgroundColor: const Color(0xFF0A0910),
       body: Stack(
         children: [
-          FundoLiquido(animation: _blobs, paleta: kPaletas[0]),
+          FundoLiquido(animation: _blobs, paleta: paleta),
           const VeuFundo(),
           SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            bottom: false,
+            child: ListView(
+              // 120 px no fim para o mini player
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('FORVEN · PITTY',
+                      Text('SOBRE O APP',
                           style: TextStyle(
-                              fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.5))),
+                              fontSize: 9, letterSpacing: 2, color: Colors.white.withOpacity(0.55))),
                       const SizedBox(height: 4),
                       const Text('Créditos',
                           style: TextStyle(
@@ -99,39 +113,72 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.8,
                               color: Colors.white)),
-                      const SizedBox(height: 7),
-                      SizedBox(
-                        width: 290,
-                        child: Text(
-                          'Quem escreveu, tocou, gravou e fotografou ${faixa?.title ?? 'este álbum'}.',
-                          style: TextStyle(
-                              fontSize: 12.5, height: 1.5, color: Colors.white.withOpacity(0.68)),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 2, 20, 20),
-                    itemCount: kCreditos.length + 1,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (_, i) {
-                      if (i == kCreditos.length) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(6, 4, 6, 0),
-                          child: Text(
-                            '℗ 2026 Forven · Gravado no Estúdio Casa Amarela, Salvador. '
-                            'Nomes de exemplo — substitua pelos créditos reais.',
-                            style: TextStyle(
-                                fontSize: 10.5, height: 1.6, color: Colors.white.withOpacity(0.55)),
-                          ),
-                        );
-                      }
-                      return _cardSecao(kCreditos[i], i);
-                    },
-                  ),
+                _hero(paleta),
+                const SizedBox(height: 12),
+                _card(
+                  icone: Icons.timer_outlined,
+                  titulo: 'Versão',
+                  filhos: [
+                    _linhas(const [
+                      ('Versão', AppInfo.versao),
+                      ('Build', AppInfo.build),
+                      ('Canal', AppInfo.canal),
+                      ('Plataforma', AppInfo.plataforma),
+                    ]),
+                    const SizedBox(height: 8),
+                    _botao(
+                      switch (_upd) {
+                        _Atualizacao.verificando => 'Verificando…',
+                        _Atualizacao.ok => 'Você está na versão mais recente',
+                        _Atualizacao.parado => 'Verificar atualizações',
+                      },
+                      _verificarAtualizacao,
+                      destaque: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _card(
+                  icone: Icons.graphic_eq_rounded,
+                  titulo: 'Reprodutor de áudio',
+                  filhos: [_linhas(kAudioInfo)],
+                ),
+                const SizedBox(height: 12),
+                _card(
+                  icone: Icons.album_outlined,
+                  titulo: 'Phonolite',
+                  filhos: [
+                    const SizedBox(height: 12),
+                    Text(PhonoliteInfo.descricao,
+                        style: TextStyle(
+                            fontSize: 13, height: 1.55, color: Colors.white.withOpacity(0.78))),
+                    _linhas(PhonoliteInfo.linhas),
+                    const SizedBox(height: 8),
+                    _botao('Conhecer a Phonolite', () {
+                      launchUrl(Uri.parse(PhonoliteInfo.url), mode: LaunchMode.externalApplication);
+                    }, icone: Icons.north_east_rounded),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _card(
+                  icone: Icons.code_rounded,
+                  titulo: 'Tecnologia',
+                  filhos: [
+                    const SizedBox(height: 12),
+                    for (var i = 0; i < kTecnologias.length; i++) ...[
+                      _tech(kTecnologias[i], kPaletas[i % kPaletas.length]),
+                      if (i < kTecnologias.length - 1) const SizedBox(height: 8),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  '© 2026 ${AppInfo.empresa} · Todos os direitos reservados.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 10.5, height: 1.6, color: Colors.white.withOpacity(0.55)),
                 ),
               ],
             ),
@@ -141,74 +188,215 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
     );
   }
 
-  Widget _cardSecao(_Secao sec, int si) {
+  Widget _hero(List<Color> paleta) {
     return Glass(
       mode: _mode,
-      radius: 22,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      radius: 24,
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.45),
+                      blurRadius: 34,
+                      offset: const Offset(0, 14)),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Image.asset('assets/icon/app_icon.png', fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text(AppInfo.nome,
+                style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.4,
+                    color: Colors.white)),
+            const SizedBox(height: 3),
+            Text('por ${AppInfo.empresa}',
+                style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.65))),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withOpacity(0.08),
+                border: Border.all(color: Colors.white.withOpacity(0.16)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF4ADE80),
+                      boxShadow: [BoxShadow(color: Color(0xFF4ADE80), blurRadius: 8)],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text('v${AppInfo.versao} · atualizado',
+                      style: TextStyle(
+                          fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _card({required IconData icone, required String titulo, required List<Widget> filhos}) {
+    return Glass(
+      mode: _mode,
+      radius: 24,
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(sec.titulo.toUpperCase(),
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(11),
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.16)),
+                ),
+                child: Icon(icone, size: 17, color: Colors.white),
+              ),
+              const SizedBox(width: 11),
+              Text(titulo.toUpperCase(),
                   style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1.8,
                       color: Colors.white)),
-              Text(sec.pessoas.length > 1 ? '${sec.pessoas.length} pessoas' : '1 pessoa',
-                  style: TextStyle(fontSize: 10.5, color: Colors.white.withOpacity(0.58))),
             ],
           ),
-          const SizedBox(height: 10),
-          ...List.generate(sec.pessoas.length, (pi) {
-            final (nome, funcao) = sec.pessoas[pi];
-            final cores = kPaletas[(si + pi) % kPaletas.length];
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 7),
+          ...filhos,
+        ],
+      ),
+    );
+  }
+
+  Widget _linhas(List<(String, String)> pares) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          for (var i = 0; i < pares.length; i++)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                border: i == 0
+                    ? null
+                    : Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+              ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 34,
-                    height: 34,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: cores.take(2).toList(),
-                      ),
-                    ),
-                    child: Text(_iniciais(nome),
-                        style: const TextStyle(
-                            fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white)),
-                  ),
-                  const SizedBox(width: 12),
+                  Text(pares[i].$1,
+                      style: TextStyle(fontSize: 12.5, color: Colors.white.withOpacity(0.64))),
+                  const SizedBox(width: 14),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(nome,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                        Text(funcao,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 11.5, color: Colors.white.withOpacity(0.65))),
-                      ],
-                    ),
+                    child: Text(pares[i].$2,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            fontFeatures: [FontFeature.tabularFigures()])),
                   ),
                 ],
               ),
-            );
-          }),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _botao(String rotulo, VoidCallback onTap, {bool destaque = false, IconData? icone}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(21),
+          color: Colors.white.withOpacity(destaque ? 0.14 : 0.08),
+          border: Border.all(color: Colors.white.withOpacity(destaque ? 0.3 : 0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(rotulo,
+                style: const TextStyle(
+                    fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white)),
+            if (icone != null) ...[
+              const SizedBox(width: 8),
+              Icon(icone, size: 13, color: Colors.white),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tech((String, String, String, String) t, List<Color> cores) {
+    final (nome, papel, versao, marca) = t;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.05),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(colors: cores.take(2).toList()),
+            ),
+            child: Text(marca,
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nome,
+                    style: const TextStyle(
+                        fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white)),
+                Text(papel,
+                    style: TextStyle(fontSize: 11.5, color: Colors.white.withOpacity(0.62))),
+              ],
+            ),
+          ),
+          Text(versao,
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.6))),
         ],
       ),
     );
