@@ -398,6 +398,11 @@ const kFotosPorAlbum = <String, List<Foto>>{
 };
 
 List<Foto> fotosDoAlbum(String? albumId) {
-  if (albumId == null) return [];
-  return kFotosPorAlbum[albumId] ?? [];
+  if (albumId == null) {
+    print('📸 fotosDoAlbum - albumId é NULL');
+    return [];
+  }
+  final fotos = kFotosPorAlbum[albumId] ?? [];
+  print('📸 fotosDoAlbum - albumId: $albumId, fotos: ${fotos.length}');
+  return fotos;
 }

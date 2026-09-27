@@ -47,9 +47,11 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     _blobs = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
-    _fotos = fotosDoAlbum(widget.albumId).isNotEmpty
-        ? fotosDoAlbum(widget.albumId)
-        : _fotosPadrao;
+    final fotosAlbum = fotosDoAlbum(widget.albumId);
+    print('📸 Gallery - Album ID: ${widget.albumId}');
+    print('📸 Gallery - Fotos encontradas: ${fotosAlbum.length}');
+    _fotos = fotosAlbum.isNotEmpty ? fotosAlbum : _fotosPadrao;
+    print('📸 Gallery - Usando: ${_fotos.length} fotos');
   }
 
   @override
