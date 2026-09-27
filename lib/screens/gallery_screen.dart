@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
 import '../models/album.dart';
 import 'liquid_player_screen.dart';
+import 'photo_viewer_screen.dart';
 
 /// Galeria em formato de feed: um card de vidro por foto, com cabeçalho,
 /// foto 4:5, ações (curtir, comentar, compartilhar, salvar), curtidas,
@@ -311,10 +312,13 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
             ),
           ),
 
-          // foto 4:5 — toque duplo curte
+          // foto 4:5 — toque para expandir, toque duplo curte
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PhotoViewerScreen(photoAsset: p.foto)),
+              ),
               onDoubleTap: () => _curtir(p, soLigar: true),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
