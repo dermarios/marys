@@ -444,6 +444,16 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   Widget _linhaTop(int i) {
     final t = _top[i];
     final atual = widget.audioService.currentTrack?.title.toLowerCase() == t.titulo.toLowerCase();
+
+    // Encontrar o álbum que contém essa música
+    Album? album;
+    for (final a in kAlbums) {
+      if (a.tracks.any((track) => track.title.toLowerCase() == t.titulo.toLowerCase())) {
+        album = a;
+        break;
+      }
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _tocarPorTitulo(t.titulo),
@@ -455,6 +465,21 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
             child: Row(
               children: [
+                if (album != null)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: AssetImage(album.coverAsset),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 40),
+                const SizedBox(width: 12),
                 SizedBox(
                   width: 20,
                   child: Text('${i + 1}',
