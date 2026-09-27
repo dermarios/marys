@@ -316,7 +316,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                       TextSpan(
                                         text: ' ${album.year}',
                                         style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w300,
                                           color: Colors.white.withOpacity(0.65),
                                           height: 1.3,
