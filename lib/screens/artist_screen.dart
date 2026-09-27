@@ -574,17 +574,20 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
         child: Glass(
           mode: _mode,
           radius: 26,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 20, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(label,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-              ],
+          child: SizedBox(
+            height: 52,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 20, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(label,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
             ),
           ),
         ),
