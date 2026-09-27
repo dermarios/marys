@@ -212,7 +212,7 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
-                child: Image.asset('assets/icon/app_icon.png', fit: BoxFit.cover),
+                child: Image.asset('assets/app-icon.jpeg', fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 14),
