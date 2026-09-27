@@ -186,12 +186,17 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: -20,
+                  top: -10,
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: BotaoExpandir(
-                      onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
                 ),
@@ -206,67 +211,3 @@ class MiniPlayer extends StatelessWidget {
   }
 }
 
-/// Pílula de vidro discreta (36×20) com seta que "respira" 1,5 px.
-class BotaoExpandir extends StatefulWidget {
-  final VoidCallback onTap;
-  const BotaoExpandir({super.key, required this.onTap});
-
-  @override
-  State<BotaoExpandir> createState() => _BotaoExpandirState();
-}
-
-class _BotaoExpandirState extends State<BotaoExpandir> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))
-        ..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: 'Expandir player',
-      child: GestureDetector(
-        onTap: widget.onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                width: 72,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF14121E).withOpacity(0.72),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white.withOpacity(0.35)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4)),
-                  ],
-                ),
-                child: AnimatedBuilder(
-                  animation: _c,
-                  builder: (_, child) => Transform.translate(
-                    offset: Offset(0, -1.5 * Curves.easeInOut.transform(_c.value)),
-                    child: child,
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_up_rounded, size: 16, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
