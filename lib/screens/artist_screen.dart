@@ -7,8 +7,10 @@ import 'package:flutter/rendering.dart';
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/models/album.dart';
 import 'package:msb_just/models/track.dart';
+import 'package:msb_just/data/track_content.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
+import 'credits_screen.dart';
 
 /// Tela "Artista" — evolução da SideScreen: a foto sangra na tela inteira e os
 /// blobs líquidos entram POR CIMA dela em blend soft-light / screen, então a
@@ -24,8 +26,8 @@ class ArtistScreen extends StatefulWidget {
 class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
-  bool _curtido = false;
   bool _carregandoAlbum = false;
+  bool _menuAberto = false;
 
   static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
 
@@ -125,7 +127,9 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
               ),
             ),
           ),
-          // 5 · conteúdo
+          // 5 · menu de contexto
+          _menuContexto(),
+          // 6 · conteúdo
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
@@ -163,20 +167,16 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: false),
-                          ),
-                        ),
-                        child: Glass(
-                          mode: _mode,
-                          radius: 19,
+                      Glass(
+                        mode: _mode,
+                        radius: 19,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _menuAberto = !_menuAberto),
                           child: SizedBox(
                             width: 38,
                             height: 38,
-                            child: Icon(Icons.chevron_right_rounded,
-                                size: 22, color: Colors.white.withOpacity(0.9)),
+                            child: Icon(Icons.sort_rounded,
+                                size: 20, color: Colors.white.withOpacity(0.9)),
                           ),
                         ),
                       ),
@@ -213,6 +213,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   Row(
                     children: [
                       Expanded(
+                        flex: 1,
                         child: GestureDetector(
                           onTap: () {
                             final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
@@ -241,15 +242,18 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                         ),
                       ),
                       const SizedBox(width: 10),
-                      _botaoVidro(Icons.library_music_rounded, () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => LibraryScreen(audioService: widget.audioService),
-                        ));
-                      }),
+                      Expanded(
+                        flex: 1,
+                        child: _botaoVidroComLabel(Icons.library_music_rounded, 'Estante', () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => LibraryScreen(audioService: widget.audioService),
+                          ));
+                        }),
+                      ),
                       const SizedBox(width: 10),
                       _botaoVidro(
-                        _curtido ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        () => setState(() => _curtido = !_curtido),
+                        Icons.share_rounded,
+                        () => abrirLink('https://open.spotify.com/artist/6Iy4SoBidxexl9DrwV3kRE?si=GNdH2ThdQ_WS5f22o0F7mA&utm_source=whatsapp'),
                       ),
                     ],
                   ),
@@ -295,15 +299,30 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                               const SizedBox(height: 12),
                               SizedBox(
                                 width: 140,
-                                child: Text(
-                                  album.title,
+                                child: RichText(
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                    height: 1.3,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: album.title,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: ' - ${album.year}',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w300,
+                                          color: Colors.white.withOpacity(0.65),
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -321,6 +340,93 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     _linhaTop(i),
                     if (i < _top.length - 1) const SizedBox(height: 8),
                   ],
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total de ${_top.length} músicas',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.65),
+                          ),
+                        ),
+                        Text(
+                          '©2016 Mary\'s Secret Box',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.65),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Glass(
+                    radius: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                          child: Image.asset(_foto, height: 180, width: double.infinity, fit: BoxFit.cover),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Sobre o artista',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Voz do rock brasileiro desde 2003, com letras diretas sobre identidade, liberdade e o peso do cotidiano.',
+                                style: TextStyle(fontSize: 12.5, height: 1.5, color: Colors.white.withOpacity(0.75)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => abrirLink('https://www.phonolite.com.br'),
+                            child: Text(
+                              'Powered by - Phonolite - Gestão de Acervos Musicais',
+                              style: TextStyle(
+                                fontSize: 10,
+                                height: 1.3,
+                                color: Colors.white.withOpacity(0.55),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => abrirLink('https://www.phonolite.com.br'),
+                          child: Text(
+                            '©PHONOLITE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.55),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -391,6 +497,16 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   Widget _linhaTop(int i) {
     final t = _top[i];
     final atual = widget.audioService.currentTrack?.title.toLowerCase() == t.titulo.toLowerCase();
+
+    // Encontrar o álbum que contém essa música
+    Album? album;
+    for (final a in kAlbums) {
+      if (a.tracks.any((track) => track.title.toLowerCase() == t.titulo.toLowerCase())) {
+        album = a;
+        break;
+      }
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _tocarPorTitulo(t.titulo),
@@ -402,6 +518,21 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
             child: Row(
               children: [
+                if (album != null)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: AssetImage(album.coverAsset),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 40),
+                const SizedBox(width: 12),
                 SizedBox(
                   width: 20,
                   child: Text('${i + 1}',
@@ -451,6 +582,129 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
     );
   }
 
+  Widget _menuContexto() {
+    const itens = [
+      ('Estante', Icons.library_music_rounded),
+      ('Sobre', Icons.info_outline_rounded),
+      ('Direitos Autorais', Icons.copyright_rounded),
+      ('Ajuda', Icons.help_outline_rounded),
+    ];
+    final topo = MediaQuery.of(context).padding.top + 8 + 38 + 8;
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: false,
+        child: Stack(
+          children: [
+            // fundo: toque fora fecha
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => setState(() => _menuAberto = false),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _menuAberto ? 1 : 0,
+                  child: Container(color: const Color(0xFF06050A).withOpacity(0.35)),
+                ),
+              ),
+            ),
+            Positioned(
+              top: topo,
+              right: 24,
+              width: 220,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _menuAberto ? 1 : 0,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 320),
+                  curve: const Cubic(.32, 1.3, .5, 1),
+                  alignment: Alignment.topRight,
+                  scale: _menuAberto ? 1 : 0.9,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF14121E).withOpacity(0.72),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 50,
+                                offset: const Offset(0, 20)),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (var k = 0; k < itens.length; k++)
+                              _itemMenu(itens[k].$1, itens[k].$2, primeiro: k == 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _itemMenu(String rotulo, IconData icone, {required bool primeiro}) {
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        highlightColor: Colors.white.withOpacity(0.08),
+        splashColor: Colors.white.withOpacity(0.06),
+        onTap: () {
+          setState(() => _menuAberto = false);
+          _abrirItem(rotulo);
+        },
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: primeiro
+                ? null
+                : Border(top: BorderSide(color: Colors.white.withOpacity(0.08))),
+          ),
+          child: Row(
+            children: [
+              Icon(icone, size: 17, color: Colors.white.withOpacity(0.85)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(rotulo,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white.withOpacity(0.5)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _abrirItem(String rotulo) {
+    switch (rotulo) {
+      case 'Estante':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => LibraryScreen(audioService: widget.audioService)));
+        break;
+      case 'Sobre':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CreditsScreen(audioService: widget.audioService)));
+        break;
+      case 'Direitos Autorais':
+        break;
+      case 'Ajuda':
+        break;
+    }
+  }
+
   Widget _botaoVidro(IconData icon, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
         child: Glass(
@@ -460,6 +714,30 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
             width: 52,
             height: 52,
             child: Icon(icon, size: 19, color: Colors.white),
+          ),
+        ),
+      );
+
+  Widget _botaoVidroComLabel(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        child: Glass(
+          mode: _mode,
+          radius: 26,
+          child: SizedBox(
+            height: 52,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 20, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(label,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
+            ),
           ),
         ),
       );

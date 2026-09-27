@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
-import 'package:msb_just/services/audio_service.dart';
+import '../services/audio_service.dart';
+import '../models/album.dart';
 import 'liquid_player_screen.dart';
+import 'photo_viewer_screen.dart';
 
-/// Galeria de fotos do artista — mesma linguagem Liquid Glass.
-/// Toque em um quadro para ampliar (ocupa a largura toda); toque de novo para voltar.
+/// Galeria em formato de feed: um card de vidro por foto, com cabeçalho,
+/// foto 4:5, ações (curtir, comentar, compartilhar, salvar), curtidas,
+/// título, descrição e data.
 ///
-/// As fotos vêm de `assets/`; troque a lista `_fotos` pelos arquivos reais e
-/// declare-os no pubspec.yaml.
+/// O mini player vem do PlayerShell:
+///   PlayerShell(audioService: s, child: GalleryScreen(audioService: s))
 class GalleryScreen extends StatefulWidget {
   final AudioService audioService;
   const GalleryScreen({super.key, required this.audioService});
@@ -16,41 +19,95 @@ class GalleryScreen extends StatefulWidget {
   State<GalleryScreen> createState() => _GalleryScreenState();
 }
 
-class _Foto {
-  final String asset;
-  final String legenda;
-  final String sub;
-  final String tag;
-  final int cols;
-  final int rows;
-  const _Foto(this.asset, this.legenda, this.sub, this.tag, this.cols, this.rows);
+class Post {
+  final String id;
+  final String foto; // asset
+  final String titulo;
+  final String descricao;
+  final String local;
+  final String data;
+  final String tag; // Palco | Bastidores | Estúdio
+  final int curtidas;
+  const Post({
+    required this.id,
+    required this.foto,
+    required this.titulo,
+    required this.descricao,
+    required this.local,
+    required this.data,
+    required this.tag,
+    required this.curtidas,
+  });
 }
+
+const _f1 = 'assets/775416812_18620508076026296_1192558196502584496_n.jpg';
+const _f2 = 'assets/Jorge-Daux-@jorgedaux.webp';
+const _f3 = 'assets/IMAGEM_NOTICIA_original.jpg';
+
+/// Posts — textos de EXEMPLO. Troque pelas fotos e legendas reais.
+const kPosts = <Post>[
+  Post(id: 'gal-1', foto: _f1, tag: 'Palco', curtidas: 18420,
+      titulo: 'Concha Acústica lotada', local: 'Concha Acústica · Salvador', data: '12 set 2024',
+      descricao: 'Voltar pra casa e ver a Concha cantando cada verso junto. Obrigada, Salvador.'),
+  Post(id: 'gal-2', foto: _f2, tag: 'Bastidores', curtidas: 6210,
+      titulo: 'Antes da passagem de som', local: 'Bastidores', data: '11 set 2024',
+      descricao: 'Os vinte minutos de silêncio antes de tudo começar.'),
+  Post(id: 'gal-3', foto: _f3, tag: 'Estúdio', curtidas: 4980,
+      titulo: 'O pedal board novo', local: 'Estúdio Casa Amarela', data: '3 mar 2023',
+      descricao: 'Três pedais a mais, zero arrependimentos. Vem coisa nova por aí.'),
+  Post(id: 'gal-4', foto: _f2, tag: 'Palco', curtidas: 9340,
+      titulo: 'Segunda voz', local: 'Audio · São Paulo', data: '19 set 2024',
+      descricao: 'Quando a plateia assume o refrão e a gente só acompanha.'),
+  Post(id: 'gal-5', foto: _f3, tag: 'Estúdio', curtidas: 3720,
+      titulo: 'Take 14', local: 'Estúdio Casa Amarela', data: '8 mar 2023',
+      descricao: 'Foi o décimo quarto. Valeu cada um dos treze anteriores.'),
+  Post(id: 'gal-6', foto: _f1, tag: 'Bastidores', curtidas: 5150,
+      titulo: 'Camarim', local: 'Bastidores · Belo Horizonte', data: '4 out 2025',
+      descricao: 'Setlist na parede, café na mão e a banda inteira contando piada.'),
+  Post(id: 'gal-7', foto: _f3, tag: 'Palco', curtidas: 22760,
+      titulo: 'Encerramento da turnê', local: 'São Paulo', data: '18 out 2025',
+      descricao: 'Último show da turnê. Saio dessa com a voz rouca e o coração cheio.'),
+  Post(id: 'gal-8', foto: _f2, tag: 'Estúdio', curtidas: 2890,
+      titulo: 'Mesa de corte', local: 'Estúdio', data: '15 mar 2023',
+      descricao: 'Onde a música vira disco. Horas de ajuste fino com a Helena.'),
+  Post(id: 'gal-9', foto: _f1, tag: 'Bastidores', curtidas: 4410,
+      titulo: 'Soundcheck', local: 'Bastidores · Porto Alegre', data: '17 out 2025',
+      descricao: 'Teste, teste, um, dois. O ritual que nunca perde a graça.'),
+];
 
 class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
   String _tab = 'Todas';
-  int? _aberta;
+  final Set<String> _curtidos = {};
+  final Set<String> _salvos = {};
+  String? _coracao; // post que está mostrando o coração do toque duplo
 
   static const _tabs = ['Todas', 'Palco', 'Bastidores', 'Estúdio'];
 
-  static const _fotos = <_Foto>[
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Concha Acústica',
-        'Salvador · 2024', 'Palco', 2, 2),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Antes da passagem', 'Bastidores', 'Bastidores', 1, 1),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Pedal board', 'Estúdio · 2023', 'Estúdio', 1, 1),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Segunda voz', 'Palco · 2024', 'Palco', 1, 2),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Take 14', 'Estúdio', 'Estúdio', 1, 1),
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Camarim',
-        'Bastidores · 2025', 'Bastidores', 1, 1),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Encerramento', 'São Paulo · 2025', 'Palco', 2, 2),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Mesa de corte', 'Estúdio', 'Estúdio', 1, 1),
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Soundcheck',
-        'Bastidores', 'Bastidores', 1, 1),
-  ];
+  List<Post> _gerarPosts() {
+    final album = widget.audioService.currentAlbum;
+    if (album == null || album.fotos.isEmpty) return kPosts;
 
-  List<_Foto> get _lista =>
-      _tab == 'Todas' ? _fotos : _fotos.where((f) => f.tag == _tab).toList();
+    return List.generate(
+      album.fotos.length,
+      (i) => Post(
+        id: 'gal-${album.id}-$i',
+        foto: album.fotos[i],
+        titulo: '${album.title} - Foto ${i + 1}',
+        descricao: 'Galeria do álbum ${album.title}',
+        local: album.title,
+        data: '${album.year}',
+        tag: 'Palco',
+        curtidas: (i + 1) * 1000,
+      ),
+    );
+  }
+
+  List<Post> get _lista {
+    final posts = _gerarPosts();
+    return _tab == 'Todas' ? posts : posts.where((p) => p.tag == _tab).toList();
+  }
 
   @override
   void initState() {
@@ -64,10 +121,35 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
     super.dispose();
   }
 
+  String _fmt(int n) {
+    final s = n.toString();
+    final b = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) b.write('.');
+      b.write(s[i]);
+    }
+    return b.toString();
+  }
+
+  void _curtir(Post p, {bool soLigar = false}) {
+    setState(() {
+      if (soLigar) {
+        _curtidos.add(p.id);
+        _coracao = p.id;
+      } else {
+        _curtidos.contains(p.id) ? _curtidos.remove(p.id) : _curtidos.add(p.id);
+      }
+    });
+    if (soLigar) {
+      Future.delayed(const Duration(milliseconds: 700), () {
+        if (mounted && _coracao == p.id) setState(() => _coracao = null);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final lista = _lista;
-
     return Scaffold(
       backgroundColor: const Color(0xFF0A0910),
       body: Stack(
@@ -75,231 +157,240 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
           FundoLiquido(animation: _blobs, paleta: kPaletas[0]),
           const VeuFundo(),
           SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('PITTY',
-                                style: TextStyle(
-                                    fontSize: 9,
-                                    letterSpacing: 2,
-                                    color: Colors.white.withOpacity(0.5))),
-                            const SizedBox(height: 4),
-                            const Text('Galeria',
-                                style: TextStyle(
-                                    fontSize: 27,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.8,
-                                    color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text('${lista.length} FOTOS',
-                            style: TextStyle(
-                                fontSize: 10,
-                                letterSpacing: 1.6,
-                                color: Colors.white.withOpacity(0.62))),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: _tabs.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (_, i) {
-                      final c = _tabs[i];
-                      final ativo = c == _tab;
-                      return GestureDetector(
-                        onTap: () => setState(() {
-                          _tab = c;
-                          _aberta = null;
-                        }),
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.white.withOpacity(ativo ? 0.16 : 0.045),
-                            border: Border.all(color: Colors.white.withOpacity(ativo ? 0.4 : 0.1)),
+            bottom: false,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('PITTY',
+                                  style: TextStyle(
+                                      fontSize: 9,
+                                      letterSpacing: 2,
+                                      color: Colors.white.withOpacity(0.55))),
+                              const SizedBox(height: 4),
+                              const Text('Galeria',
+                                  style: TextStyle(
+                                      fontSize: 27,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: -0.8,
+                                      color: Colors.white)),
+                            ],
                           ),
-                          child: Text(c,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text('${lista.length} FOTOS',
                               style: TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(ativo ? 1 : 0.65))),
+                                  fontSize: 10,
+                                  letterSpacing: 1.6,
+                                  color: Colors.white.withOpacity(0.6))),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 14),
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 2, 20, 12),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      mainAxisExtent: 104,
-                    ),
+                SliverToBoxAdapter(child: _filtros()),
+                SliverPadding(
+                  // 120 px no fim para o mini player
+                  padding: const EdgeInsets.fromLTRB(14, 18, 14, 120),
+                  sliver: SliverList.separated(
                     itemCount: lista.length,
-                    itemBuilder: (_, i) => _quadro(lista[i], i),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-                  child: Glass(
-                    mode: _mode,
-                    radius: 25,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        children: [
-                          Icon(Icons.photo_library_outlined,
-                              size: 17, color: Colors.white.withOpacity(0.8)),
-                          const SizedBox(width: 11),
-                          Expanded(
-                            child: Text('Toque em uma foto para ampliar',
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.white.withOpacity(0.72))),
-                          ),
-                        ],
-                      ),
-                    ),
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    itemBuilder: (_, i) => _post(lista[i], i),
                   ),
                 ),
               ],
             ),
           ),
-          if (_aberta != null) _visor(lista[_aberta!]),
         ],
       ),
     );
   }
 
-  Widget _quadro(_Foto f, int i) {
-    return GestureDetector(
-      onTap: () => setState(() => _aberta = i),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.35), blurRadius: 30, offset: const Offset(0, 12)),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(f.asset,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(color: Colors.white10)),
-              DecoratedBox(
+  Widget _filtros() => SizedBox(
+        height: 32,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: _tabs.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (_, i) {
+            final c = _tabs[i];
+            final ativo = c == _tab;
+            return GestureDetector(
+              onTap: () => setState(() => _tab = c),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, const Color(0xFF08070C).withOpacity(0.82)],
-                    stops: const [0.42, 1],
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white.withOpacity(ativo ? 0.16 : 0.045),
+                  border: Border.all(color: Colors.white.withOpacity(ativo ? 0.4 : 0.1)),
+                ),
+                child: Text(c,
+                    style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(ativo ? 1 : 0.65))),
+              ),
+            );
+          },
+        ),
+      );
+
+  Widget _post(Post p, int i) {
+    final curtido = _curtidos.contains(p.id);
+    final salvo = _salvos.contains(p.id);
+    final cores = kPaletas[i % kPaletas.length];
+
+    return Glass(
+      mode: _mode,
+      radius: 26,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // cabeçalho
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(colors: [cores[0], cores[2]]),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF0A0910), width: 2),
+                      image: DecorationImage(image: AssetImage(widget.audioService.currentAlbum?.coverAsset ?? _f1), fit: BoxFit.cover),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 10,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(f.legenda,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            shadows: [Shadow(color: Colors.black54, blurRadius: 12)])),
-                    Text(f.sub,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 10.5, color: Colors.white.withOpacity(0.82))),
-                  ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Mary's Secret Box",
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                      Text(p.local,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.62))),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white.withOpacity(0.08),
+                    border: Border.all(color: Colors.white.withOpacity(0.14)),
+                  ),
+                  child: Text(p.tag.toUpperCase(),
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.8,
+                          color: Colors.white.withOpacity(0.8))),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
 
-  /// Visor em tela cheia com fundo de vidro.
-  Widget _visor(_Foto f) {
-    return Positioned.fill(
-      child: GestureDetector(
-        onTap: () => setState(() => _aberta = null),
-        child: Container(
-          color: Colors.black.withOpacity(0.55),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Glass(
-                mode: _mode,
-                radius: 26,
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(18),
-                      child: Image.asset(f.asset,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              Container(height: 240, color: Colors.white10)),
-                    ),
-                    const SizedBox(height: 11),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4, bottom: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(f.legenda,
-                              style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
-                          const SizedBox(height: 2),
-                          Text(f.sub,
-                              style: TextStyle(
-                                  fontSize: 11.5, color: Colors.white.withOpacity(0.65))),
-                        ],
+          // foto 4:5 — toque para expandir, toque duplo curte
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PhotoViewerScreen(photoAsset: p.foto)),
+              ),
+              onDoubleTap: () => _curtir(p, soLigar: true),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: AspectRatio(
+                  aspectRatio: 4 / 5,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: cores,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      Image.asset(p.foto,
+                          fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
+                      Center(
+                        child: AnimatedScale(
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutBack,
+                          scale: _coracao == p.id ? 1 : 0,
+                          child: const Icon(Icons.favorite_rounded,
+                              size: 92,
+                              color: Colors.white,
+                              shadows: [Shadow(color: Colors.black45, blurRadius: 24)]),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+
+          // texto
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(p.titulo,
+                    style: const TextStyle(
+                        fontSize: 17,
+                        height: 1.25,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.3,
+                        color: Colors.white)),
+                const SizedBox(height: 5),
+                Text(p.descricao,
+                    style: TextStyle(
+                        fontSize: 13, height: 1.55, color: Colors.white.withOpacity(0.78))),
+                const SizedBox(height: 11),
+                Text(p.data.toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.4,
+                        color: Colors.white.withOpacity(0.5))),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _acao(Widget icone, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(width: 44, height: 44, child: Center(child: icone)),
+      );
 }

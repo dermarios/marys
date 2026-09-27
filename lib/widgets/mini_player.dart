@@ -1,65 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:msb_just/screens/liquid_player_screen.dart';
 import 'package:msb_just/services/audio_service.dart';
-
-class ExpandIndicator extends StatefulWidget {
-  const ExpandIndicator({super.key});
-
-  @override
-  State<ExpandIndicator> createState() => _ExpandIndicatorState();
-}
-
-class _ExpandIndicatorState extends State<ExpandIndicator>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _translateAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _translateAnimation = Tween<double>(begin: 0.0, end: -3.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_scaleAnimation, _translateAnimation]),
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _translateAnimation.value),
-          child: Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Icon(
-              Icons.expand_less_rounded,
-              color: Colors.white.withOpacity(0.8),
-              size: 22,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
 
 /// Envolve qualquer tela e coloca o player flutuante no rodapé.
 ///
@@ -71,16 +16,24 @@ class PlayerShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(child: child),
-        Positioned(
-          left: 10,
-          right: 10,
-          bottom: MediaQuery.of(context).padding.bottom + 8,
-          child: MiniPlayer(audioService: audioService),
-        ),
-      ],
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        audioService.currentTrackNotifier,
+        audioService.playerExpandedNotifier,
+      ]),
+      builder: (context, _) {
+        return Stack(
+          children: [
+            Positioned.fill(child: child),
+            Positioned(
+              left: 10,
+              right: 10,
+              bottom: MediaQuery.of(context).padding.bottom + 8,
+              child: MiniPlayer(audioService: audioService),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -103,16 +56,31 @@ class MiniPlayer extends StatelessWidget {
 
   AudioPlayer get _p => audioService.player;
 
+  String _formatDuration(Duration d) {
+    if (d == Duration.zero) return '0:00';
+    final minutes = d.inMinutes;
+    final seconds = d.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
       child: ListenableBuilder(
-        listenable: Listenable.merge(
-            [audioService.currentTrackNotifier, audioService.currentAlbumNotifier]),
+        listenable: Listenable.merge([
+          audioService.currentTrackNotifier,
+          audioService.currentAlbumNotifier,
+          audioService.playerExpandedNotifier,
+        ]),
         builder: (context, _) {
           final track = audioService.currentTrack;
-          if (track == null) return const SizedBox.shrink();
+          if (track == null) {
+            return const SizedBox.shrink();
+          }
+          if (audioService.playerExpandedNotifier.value) {
+            return const SizedBox.shrink();
+          }
           return StreamBuilder<PlayerState>(
             stream: _p.playerStateStream,
             builder: (context, snap) {
@@ -124,12 +92,16 @@ class MiniPlayer extends StatelessWidget {
 
           return GestureDetector(
             onTap: () => Navigator.of(context).push(rotaPlayerExpandido(audioService)),
-            child: Glass(
-              radius: 22,
-              child: SizedBox(
-                height: 64,
-                child: Stack(
-                  children: [
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Glass(
+                  radius: 22,
+                  child: SizedBox(
+                    height: 64,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 8, 0),
                       child: Row(
@@ -169,18 +141,20 @@ class MiniPlayer extends StatelessWidget {
                               ],
                             ),
                           ),
+                          Text(
+                            _formatDuration(track.duration),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.white.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           IconButton(
                             onPressed: () =>
                                 tocando ? audioService.pause() : audioService.resume(),
                             icon: Icon(tocando ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                 color: Colors.white, size: 26),
                           ),
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: Center(child: const ExpandIndicator()),
-                          ),
-                          const SizedBox(width: 4),
                         ],
                       ),
                     ),
@@ -207,9 +181,26 @@ class MiniPlayer extends StatelessWidget {
                         },
                       ),
                     ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: 6,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             );
             },
@@ -219,3 +210,4 @@ class MiniPlayer extends StatelessWidget {
     );
   }
 }
+

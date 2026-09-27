@@ -5,12 +5,16 @@ class Album {
   final String title;
   final String coverAsset;
   final List<Track> tracks;
+  final int year;
+  final List<String> fotos;
 
   Album({
     required this.id,
     required this.title,
     required this.coverAsset,
     required this.tracks,
+    required this.year,
+    this.fotos = const [],
   });
 }
 
@@ -19,6 +23,7 @@ final kAlbums = [
     id: 'beyond-smoke',
     title: 'Beyond Smoke',
     coverAsset: 'assets/albuns/beyond-smolke/a2940860726_1x1_700.avif',
+    year: 2020,
     tracks: [
       Track(
         path: 'assets/albuns/beyond-smolke/01 - Beyond Smoke.mp3',
@@ -31,6 +36,7 @@ final kAlbums = [
     id: 'escravos-do-tempo',
     title: 'Escravos do Tempo\nContinuo e Lento',
     coverAsset: 'assets/albuns/escravos-do-tempo-continuo-e-lento/51Lw+X7jACL._UXNaN_FMjpg_QL85_.jpg',
+    year: 2021,
     tracks: [
       Track(
         path: 'assets/albuns/escravos-do-tempo-continuo-e-lento/01 - A Temperança.mp3',
@@ -63,6 +69,17 @@ final kAlbums = [
     id: 'just',
     title: 'Just',
     coverAsset: 'assets/albuns/just/Jorge-Daux-@jorgedaux.webp',
+    year: 2024,
+    fotos: [
+      'assets/albuns/just/fotos/596808697_25618519724439065_5418686845622157502_n.jpg',
+      'assets/albuns/just/fotos/596810720_25618519681105736_8647549233638235941_n.jpg',
+      'assets/albuns/just/fotos/597814157_25618519791105725_1282261320201049684_n.jpg',
+      'assets/albuns/just/fotos/597967119_25618519647772406_5351213839960951359_n.jpg',
+      'assets/albuns/just/fotos/598015977_25618975347726836_2284519281725335253_n.jpg',
+      'assets/albuns/just/fotos/599940809_25618094744481563_5618017685269495687_n.jpg',
+      'assets/albuns/just/fotos/647394672_26380402064917490_2009591765790192284_n.jpg',
+      'assets/albuns/just/fotos/648933701_26380725371551826_3678365400862571929_n.jpg',
+    ],
     tracks: [
       Track(
         path: 'assets/albuns/just/01 - Leprechaun.mp3',
