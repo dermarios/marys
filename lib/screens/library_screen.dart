@@ -269,13 +269,16 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
               ],
             ),
           ),
-          Glass(
-            mode: _mode,
-            radius: 20,
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: Icon(Icons.sort_rounded, size: 18, color: Colors.white.withOpacity(0.85)),
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Glass(
+              mode: _mode,
+              radius: 20,
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(Icons.close_rounded, size: 20, color: Colors.white.withOpacity(0.85)),
+              ),
             ),
           ),
         ],
