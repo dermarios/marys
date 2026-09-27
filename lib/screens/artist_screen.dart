@@ -300,15 +300,30 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                               const SizedBox(height: 12),
                               SizedBox(
                                 width: 140,
-                                child: Text(
-                                  '${album.title}\n${album.year}',
-                                  maxLines: 3,
+                                child: RichText(
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                    height: 1.3,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: album.title,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: ' ${album.year}',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Colors.white.withOpacity(0.65),
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
