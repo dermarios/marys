@@ -244,7 +244,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        flex: 15,
+                        flex: 12,
                         child: _botaoVidroComLabel(Icons.library_music_rounded, 'Estante', () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => LibraryScreen(audioService: widget.audioService),
