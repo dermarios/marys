@@ -213,40 +213,40 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
-                            widget.audioService.playAlbum(currentAlbum);
-                            _abrirPlayer();
-                          },
-                          child: Glass(
-                            mode: _mode,
-                            radius: 26,
-                            child: SizedBox(
-                              height: 52,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
-                                  const SizedBox(width: 8),
-                                  const Text('Tocar',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white)),
-                                ],
-                              ),
+                      GestureDetector(
+                        onTap: () {
+                          final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
+                          widget.audioService.playAlbum(currentAlbum);
+                          _abrirPlayer();
+                        },
+                        child: Glass(
+                          mode: _mode,
+                          radius: 26,
+                          child: SizedBox(
+                            height: 52,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
+                                const SizedBox(width: 8),
+                                const Text('Tocar',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white)),
+                              ],
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
-                      _botaoVidro(Icons.library_music_rounded, () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => LibraryScreen(audioService: widget.audioService),
-                        ));
-                      }),
+                      Expanded(
+                        child: _botaoVidroComLabel(Icons.library_music_rounded, 'Estante', () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => LibraryScreen(audioService: widget.audioService),
+                          ));
+                        }),
+                      ),
                       const SizedBox(width: 10),
                       _botaoVidro(
                         _curtido ? Icons.favorite_rounded : Icons.favorite_border_rounded,
@@ -385,21 +385,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           child: GestureDetector(
                             onTap: () => abrirLink('https://www.phonolite.com.br'),
                             child: Text(
-                              'Powered by - Phonolite\nGestão de Acervos Musicais',
-                              style: TextStyle(
-                                fontSize: 10,
-                                height: 1.3,
-                                color: Colors.white.withOpacity(0.55),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => abrirLink('https://www.forven.com.br'),
-                            child: Text(
-                              'Designed by ®Forven\nTecnologia',
-                              textAlign: TextAlign.right,
+                              'Powered by - Phonolite - Gestão de Acervos Musicais',
                               style: TextStyle(
                                 fontSize: 10,
                                 height: 1.3,
@@ -575,6 +561,27 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
             width: 52,
             height: 52,
             child: Icon(icon, size: 19, color: Colors.white),
+          ),
+        ),
+      );
+
+  Widget _botaoVidroComLabel(IconData icon, String label, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        child: Glass(
+          mode: _mode,
+          radius: 26,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 20, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(label,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+              ],
+            ),
           ),
         ),
       );
