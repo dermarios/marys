@@ -214,7 +214,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   Row(
                     children: [
                       Expanded(
-                        flex: 2,
+                        flex: 1,
                         child: GestureDetector(
                           onTap: () {
                             final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
@@ -244,7 +244,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        flex: 12,
+                        flex: 1,
                         child: _botaoVidroComLabel(Icons.library_music_rounded, 'Estante', () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => LibraryScreen(audioService: widget.audioService),
