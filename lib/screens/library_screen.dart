@@ -18,7 +18,7 @@ class LibraryScreen extends StatefulWidget {
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-enum TipoLancamento { album, singleEp, compilacao }
+enum TipoLancamento { todos, album, singleEp, compilacao }
 
 class Lancamento {
   final String titulo;
@@ -39,9 +39,10 @@ const kDiscografia = <Lancamento>[
 class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
-  TipoLancamento _filtro = TipoLancamento.album;
+  TipoLancamento _filtro = TipoLancamento.todos;
 
   static const _chips = <(TipoLancamento, String)>[
+    (TipoLancamento.todos, 'Todos'),
     (TipoLancamento.album, 'Álbuns'),
     (TipoLancamento.singleEp, 'Singles e EPs'),
     (TipoLancamento.compilacao, 'Compilações'),
@@ -88,7 +89,9 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final lista = kDiscografia.where((l) => l.categoria == _filtro).toList();
+    final lista = _filtro == TipoLancamento.todos
+        ? kDiscografia
+        : kDiscografia.where((l) => l.categoria == _filtro).toList();
     final atual = widget.audioService.currentTrack?.title.toLowerCase();
 
     return Scaffold(
