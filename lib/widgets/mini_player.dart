@@ -56,6 +56,13 @@ class MiniPlayer extends StatelessWidget {
 
   AudioPlayer get _p => audioService.player;
 
+  String _formatDuration(Duration d) {
+    if (d == Duration.zero) return '0:00';
+    final minutes = d.inMinutes;
+    final seconds = d.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -134,6 +141,14 @@ class MiniPlayer extends StatelessWidget {
                               ],
                             ),
                           ),
+                          Text(
+                            _formatDuration(track.duration),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.white.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           IconButton(
                             onPressed: () =>
                                 tocando ? audioService.pause() : audioService.resume(),
