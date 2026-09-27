@@ -31,9 +31,9 @@ class Lancamento {
 
 /// Discografia — Álbuns reais disponíveis no app
 const kDiscografia = <Lancamento>[
-  Lancamento('Beyond Smoke', '2020', 'Álbum', TipoLancamento.album),
-  Lancamento('Escravos do Tempo\nContinuo e Lento', '2021', 'Álbum', TipoLancamento.album),
-  Lancamento('Just', '2024', 'Álbum', TipoLancamento.album),
+  Lancamento('Beyond Smoke', '2020', 'Álbum', TipoLancamento.album, capa: 'assets/albuns/beyond-smolke/a2940860726_1x1_700.avif'),
+  Lancamento('Escravos do Tempo\nContinuo e Lento', '2021', 'Álbum', TipoLancamento.album, capa: 'assets/albuns/escravos-do-tempo-continuo-e-lento/51Lw+X7jACL._UXNaN_FMjpg_QL85_.jpg'),
+  Lancamento('Just', '2024', 'Álbum', TipoLancamento.album, capa: 'assets/albuns/just/Jorge-Daux-@jorgedaux.webp'),
 ];
 
 class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProviderStateMixin {
