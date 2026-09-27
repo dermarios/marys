@@ -373,3 +373,33 @@ String linkAppleMusic(String t) => 'https://music.apple.com/br/search?term=${_q(
 String linkAppleMusicAlbum(String id) => 'https://music.apple.com/br/album/just/$id';
 String linkDeezer(String t) => 'https://www.deezer.com/search/${_q(t)}';
 String linkDeezerAlbum(String id) => 'https://link.deezer.com/s/$id';
+
+// ─── Fotos por álbum ────────────────────────────────────────────────
+class Foto {
+  final String asset;
+  final String legenda;
+  final String sub;
+  final int cols;
+  final int rows;
+  const Foto(this.asset, this.legenda, this.sub, this.cols, this.rows);
+}
+
+const kFotosPorAlbum = <String, List<Foto>>{
+  'just': [
+    Foto('assets/albuns/just/fotos/foto1.jpg', 'Foto 1', 'Just', 2, 1),
+    Foto('assets/albuns/just/fotos/foto2.jpg', 'Foto 2', 'Just', 1, 1),
+    Foto('assets/albuns/just/fotos/foto3.jpg', 'Foto 3', 'Just', 1, 2),
+    Foto('assets/albuns/just/fotos/foto4.jpg', 'Foto 4', 'Just', 1, 1),
+  ],
+  'beyond-smoke': [
+    Foto('assets/albuns/beyond-smolke/fotos/foto1.jpg', 'Foto 1', 'Beyond Smoke', 2, 1),
+  ],
+  'escravos-do-tempo': [
+    Foto('assets/albuns/escravos-do-tempo-continuo-e-lento/fotos/foto1.jpg', 'Foto 1', 'Escravos do Tempo', 2, 1),
+  ],
+};
+
+List<Foto> fotosDoAlbum(String? albumId) {
+  if (albumId == null) return [];
+  return kFotosPorAlbum[albumId] ?? [];
+}

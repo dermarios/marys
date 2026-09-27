@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:msb_just/services/audio_service.dart';
+import 'package:msb_just/data/track_content.dart';
 import 'liquid_player_screen.dart';
 
 /// Galeria de fotos do artista — mesma linguagem Liquid Glass.
@@ -10,20 +11,11 @@ import 'liquid_player_screen.dart';
 /// declare-os no pubspec.yaml.
 class GalleryScreen extends StatefulWidget {
   final AudioService audioService;
-  const GalleryScreen({super.key, required this.audioService});
+  final String? albumId;
+  const GalleryScreen({super.key, required this.audioService, this.albumId});
 
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
-}
-
-class _Foto {
-  final String asset;
-  final String legenda;
-  final String sub;
-  final String tag;
-  final int cols;
-  final int rows;
-  const _Foto(this.asset, this.legenda, this.sub, this.tag, this.cols, this.rows);
 }
 
 class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProviderStateMixin {
@@ -32,30 +24,32 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
   String _tab = 'Todas';
   int? _aberta;
 
-  static const _tabs = ['Todas', 'Palco', 'Bastidores', 'Estúdio'];
+  late List<Foto> _fotos;
 
-  static const _fotos = <_Foto>[
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Concha Acústica',
-        'Salvador · 2024', 'Palco', 2, 2),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Antes da passagem', 'Bastidores', 'Bastidores', 1, 1),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Pedal board', 'Estúdio · 2023', 'Estúdio', 1, 1),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Segunda voz', 'Palco · 2024', 'Palco', 1, 2),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Take 14', 'Estúdio', 'Estúdio', 1, 1),
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Camarim',
-        'Bastidores · 2025', 'Bastidores', 1, 1),
-    _Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Encerramento', 'São Paulo · 2025', 'Palco', 2, 2),
-    _Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Mesa de corte', 'Estúdio', 'Estúdio', 1, 1),
-    _Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Soundcheck',
-        'Bastidores', 'Bastidores', 1, 1),
+  static const _fotosPadrao = <Foto>[
+    Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Concha Acústica',
+        'Salvador · 2024', 2, 2),
+    Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Antes da passagem', 'Bastidores', 1, 1),
+    Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Pedal board', 'Estúdio · 2023', 1, 1),
+    Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Segunda voz', 'Palco · 2024', 1, 2),
+    Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Take 14', 'Estúdio', 1, 1),
+    Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Camarim',
+        'Bastidores · 2025', 1, 1),
+    Foto('assets/IMAGEM_NOTICIA_original.jpg', 'Encerramento', 'São Paulo · 2025', 2, 2),
+    Foto('assets/Jorge-Daux-@jorgedaux.webp', 'Mesa de corte', 'Estúdio', 1, 1),
+    Foto('assets/775416812_18620508076026296_1192558196502584496_n.jpg', 'Soundcheck',
+        'Bastidores', 1, 1),
   ];
 
-  List<_Foto> get _lista =>
-      _tab == 'Todas' ? _fotos : _fotos.where((f) => f.tag == _tab).toList();
+  List<Foto> get _lista => _fotos;
 
   @override
   void initState() {
     super.initState();
     _blobs = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
+    _fotos = fotosDoAlbum(widget.albumId).isNotEmpty
+        ? fotosDoAlbum(widget.albumId)
+        : _fotosPadrao;
   }
 
   @override
@@ -114,39 +108,6 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
                   ),
                 ),
                 const SizedBox(height: 14),
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: _tabs.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (_, i) {
-                      final c = _tabs[i];
-                      final ativo = c == _tab;
-                      return GestureDetector(
-                        onTap: () => setState(() {
-                          _tab = c;
-                          _aberta = null;
-                        }),
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.white.withOpacity(ativo ? 0.16 : 0.045),
-                            border: Border.all(color: Colors.white.withOpacity(ativo ? 0.4 : 0.1)),
-                          ),
-                          child: Text(c,
-                              style: TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(ativo ? 1 : 0.65))),
-                        ),
-                      );
-                    },
-                  ),
-                ),
                 const SizedBox(height: 14),
                 Expanded(
                   child: GridView.builder(
@@ -193,7 +154,7 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
     );
   }
 
-  Widget _quadro(_Foto f, int i) {
+  Widget _quadro(Foto f, int i) {
     return GestureDetector(
       onTap: () => setState(() => _aberta = i),
       child: Container(
@@ -253,7 +214,7 @@ class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProvider
   }
 
   /// Visor em tela cheia com fundo de vidro.
-  Widget _visor(_Foto f) {
+  Widget _visor(Foto f) {
     return Positioned.fill(
       child: GestureDetector(
         onTap: () => setState(() => _aberta = null),

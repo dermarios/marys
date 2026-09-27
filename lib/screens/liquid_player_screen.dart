@@ -278,7 +278,10 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => GalleryScreen(audioService: widget.audioService),
+                          builder: (_) => GalleryScreen(
+                            audioService: widget.audioService,
+                            albumId: widget.audioService.currentAlbum?.id,
+                          ),
                         ),
                       ),
                       child: Glass(
