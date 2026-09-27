@@ -7,7 +7,7 @@ import '../models/track.dart';
 import '../models/album.dart';
 import 'lock_screen_audio_handler.dart';
 
-class PittyAudioService {
+class MarysAudioService {
   late AudioPlayer _player;
   late LockScreenAudioHandler _audioHandler;
   List<Track> _tracks = [];
@@ -29,7 +29,7 @@ class PittyAudioService {
   final _opQueue = <Future<void> Function()>[];
   bool _emExecucao = false;
 
-  PittyAudioService(this._audioHandler) {
+  MarysAudioService(this._audioHandler) {
     _player = _audioHandler.player;
     currentTrackNotifier = ValueNotifier<Track?>(null);
     currentAlbumNotifier = ValueNotifier<Album?>(null);
@@ -271,4 +271,4 @@ class PittyAudioService {
   }
 }
 
-typedef AudioService = PittyAudioService;
+typedef AudioService = MarysAudioService;

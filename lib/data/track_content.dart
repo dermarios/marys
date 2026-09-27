@@ -3,7 +3,7 @@ import 'package:maryssecretbox/models/track.dart';
 
 /// Conteúdo editorial das faixas. Tudo aqui é EXEMPLO — troque pelos dados reais.
 
-const kSiteArtista = 'https://pitty.com.br';
+const kSiteArtista = 'https://marysbox.com.br';
 
 const kBioArtista =
     'Voz do rock brasileiro desde 2003, com letras diretas sobre identidade, liberdade e o peso do cotidiano.';

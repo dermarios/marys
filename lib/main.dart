@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audio_service/audio_service.dart';
-import 'services/audio_service.dart' as pitty_audio;
+import 'services/audio_service.dart' as marys_audio;
 import 'services/lock_screen_audio_handler.dart';
 import 'screens/liquid_player_screen.dart';
 import 'screens/gallery_screen.dart';
@@ -9,7 +9,7 @@ import 'screens/artist_screen.dart';
 import 'widgets/mini_player.dart';
 
 late LockScreenAudioHandler audioHandler;
-late pitty_audio.PittyAudioService audioService;
+late marys_audio.MarysAudioService audioService;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ void main() async {
   final handler = await AudioService.init(
     builder: () => LockScreenAudioHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.forven.pittyplayer.channel.audio',
+      androidNotificationChannelId: 'com.forven.maryssecretbox.channel.audio',
       androidNotificationChannelName: 'Just',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
@@ -27,8 +27,8 @@ void main() async {
   audioHandler = handler as LockScreenAudioHandler;
   print('✅ AudioService ready');
 
-  audioService = pitty_audio.PittyAudioService(audioHandler);
-  print('✅ PittyAudioService created');
+  audioService = marys_audio.MarysAudioService(audioHandler);
+  print('✅ MarysAudioService created');
 
   runApp(const MyApp());
 }
