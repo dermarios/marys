@@ -18,7 +18,7 @@ void main() async {
   final handler = await AudioService.init(
     builder: () => LockScreenAudioHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.forven.maryssecretbox.channel.audio',
+      androidNotificationChannelId: 'com.maryssecretbox.app.channel.audio',
       androidNotificationChannelName: 'Just',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,

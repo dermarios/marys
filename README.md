@@ -7,7 +7,7 @@ Um app Flutter para reproduzir arquivos MP3 armazenados nos assets do app, 100% 
 - **iOS Deployment Target**: 15.0
 - **Supported Devices**: iPhone e iPad
 - **Development Team**: WN6A2CJM96 (Forven)
-- **Bundle ID**: br.com.maryssecretbox
+- **Bundle ID**: com.maryssecretbox.app
 - **Package Name**: maryssecretbox
 - **Display Name**: Marys
 - **Background Modes**: Audio (habilitado para reprodução em segundo plano)
