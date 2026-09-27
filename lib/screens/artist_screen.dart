@@ -321,6 +321,31 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     _linhaTop(i),
                     if (i < _top.length - 1) const SizedBox(height: 8),
                   ],
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total de ${_top.length} músicas',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.65),
+                          ),
+                        ),
+                        Text(
+                          '©2016 Mary\'s Secret Box',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.65),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 32),
                   Glass(
                     radius: 22,
