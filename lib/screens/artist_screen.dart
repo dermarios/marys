@@ -213,34 +213,38 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
-                          widget.audioService.playAlbum(currentAlbum);
-                          _abrirPlayer();
-                        },
-                        child: Glass(
-                          mode: _mode,
-                          radius: 26,
-                          child: SizedBox(
-                            height: 52,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
-                                const SizedBox(width: 8),
-                                const Text('Tocar',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white)),
-                              ],
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            final currentAlbum = widget.audioService.currentAlbum ?? kAlbums.first;
+                            widget.audioService.playAlbum(currentAlbum);
+                            _abrirPlayer();
+                          },
+                          child: Glass(
+                            mode: _mode,
+                            radius: 26,
+                            child: SizedBox(
+                              height: 52,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
+                                  const SizedBox(width: 8),
+                                  const Text('Tocar',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white)),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
+                        flex: 1,
                         child: _botaoVidroComLabel(Icons.library_music_rounded, 'Estante', () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => LibraryScreen(audioService: widget.audioService),
