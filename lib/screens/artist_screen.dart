@@ -321,6 +321,34 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                     _linhaTop(i),
                     if (i < _top.length - 1) const SizedBox(height: 8),
                   ],
+                  const SizedBox(height: 32),
+                  Glass(
+                    radius: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                          child: Image.asset(_foto, height: 180, width: double.infinity, fit: BoxFit.cover),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Sobre o artista',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Voz do rock brasileiro desde 2003, com letras diretas sobre identidade, liberdade e o peso do cotidiano.',
+                                style: TextStyle(fontSize: 12.5, height: 1.5, color: Colors.white.withOpacity(0.75)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
