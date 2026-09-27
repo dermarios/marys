@@ -167,30 +167,8 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       Glass(
                         mode: _mode,
                         radius: 19,
-                        child: PopupMenuButton(
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'sobre',
-                              child: Text('Sobre'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'direitos',
-                              child: Text('Direitos Autorais'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'ajuda',
-                              child: Text('Ajuda'),
-                            ),
-                          ],
-                          onSelected: (value) {
-                            if (value == 'sobre') {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => CreditsScreen(audioService: widget.audioService),
-                                ),
-                              );
-                            }
-                          },
+                        child: GestureDetector(
+                          onTap: () => _mostrarMenuContexto(),
                           child: SizedBox(
                             width: 38,
                             height: 38,
@@ -600,6 +578,60 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
       ),
     );
   }
+
+  void _mostrarMenuContexto() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 60, right: 24),
+            child: Glass(
+              radius: 16,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _itemMenu('Sobre', () {
+                    Navigator.pop(context);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => CreditsScreen(audioService: widget.audioService),
+                      ),
+                    );
+                  }),
+                  Divider(color: Colors.white.withOpacity(0.2), height: 1),
+                  _itemMenu('Direitos Autorais', () {
+                    Navigator.pop(context);
+                  }),
+                  Divider(color: Colors.white.withOpacity(0.2), height: 1),
+                  _itemMenu('Ajuda', () {
+                    Navigator.pop(context);
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _itemMenu(String label, VoidCallback onTap) => GestureDetector(
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+      ),
+    ),
+  );
 
   Widget _botaoVidro(IconData icon, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
