@@ -386,16 +386,14 @@ class Foto {
 
 const kFotosPorAlbum = <String, List<Foto>>{
   'just': [
-    Foto('assets/albuns/just/fotos/foto1.jpg', 'Foto 1', 'Just', 2, 1),
-    Foto('assets/albuns/just/fotos/foto2.jpg', 'Foto 2', 'Just', 1, 1),
-    Foto('assets/albuns/just/fotos/foto3.jpg', 'Foto 3', 'Just', 1, 2),
-    Foto('assets/albuns/just/fotos/foto4.jpg', 'Foto 4', 'Just', 1, 1),
-  ],
-  'beyond-smoke': [
-    Foto('assets/albuns/beyond-smolke/fotos/foto1.jpg', 'Foto 1', 'Beyond Smoke', 2, 1),
-  ],
-  'escravos-do-tempo': [
-    Foto('assets/albuns/escravos-do-tempo-continuo-e-lento/fotos/foto1.jpg', 'Foto 1', 'Escravos do Tempo', 2, 1),
+    Foto('assets/albuns/just/fotos/596808697_25618519724439065_5418686845622157502_n.jpg', 'Foto 1', 'Just', 2, 1),
+    Foto('assets/albuns/just/fotos/596810720_25618519681105736_8647549233638235941_n.jpg', 'Foto 2', 'Just', 1, 1),
+    Foto('assets/albuns/just/fotos/597814157_25618519791105725_1282261320201049684_n.jpg', 'Foto 3', 'Just', 1, 2),
+    Foto('assets/albuns/just/fotos/597967119_25618519647772406_5351213839960951359_n.jpg', 'Foto 4', 'Just', 1, 1),
+    Foto('assets/albuns/just/fotos/598015977_25618975347726836_2284519281725335253_n.jpg', 'Foto 5', 'Just', 1, 1),
+    Foto('assets/albuns/just/fotos/599940809_25618094744481563_5618017685269495687_n.jpg', 'Foto 6', 'Just', 2, 1),
+    Foto('assets/albuns/just/fotos/647394672_26380402064917490_2009591765790192284_n.jpg', 'Foto 7', 'Just', 1, 1),
+    Foto('assets/albuns/just/fotos/648933701_26380725371551826_3678365400862571929_n.jpg', 'Foto 8', 'Just', 2, 2),
   ],
 };
 
