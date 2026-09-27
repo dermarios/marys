@@ -233,7 +233,11 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
                       childAspectRatio: 0.74,
                     ),
                     delegate: SliverChildBuilderDelegate(
-                      (_, i) => _capaCard(lista[i], i, atual == lista[i].titulo.toLowerCase()),
+                      (_, i) {
+                        final item = lista[i];
+                        final indiceOriginal = kDiscografia.indexOf(item);
+                        return _capaCard(item, indiceOriginal, atual == item.titulo.toLowerCase());
+                      },
                       childCount: lista.length,
                     ),
                   ),
