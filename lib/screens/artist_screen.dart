@@ -394,23 +394,6 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () => abrirLink('https://www.phonolite.com.br'),
-                        child: Text(
-                          '©PHONOLITE',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.65),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 24),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -427,6 +410,18 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                 height: 1.3,
                                 color: Colors.white.withOpacity(0.55),
                               ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => abrirLink('https://www.phonolite.com.br'),
+                          child: Text(
+                            '©PHONOLITE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.55),
                             ),
                           ),
                         ),
