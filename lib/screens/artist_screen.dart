@@ -186,7 +186,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                             if (value == 'sobre') {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => CreditsScreen(),
+                                  builder: (_) => CreditsScreen(audioService: widget.audioService),
                                 ),
                               );
                             }
