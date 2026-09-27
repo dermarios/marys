@@ -373,7 +373,7 @@ class SobreArtistaCard extends StatelessWidget {
                 children: [
                   const Text('Mary\'s Secret Box',
                       style: TextStyle(
-                          fontSize: 24, fontStyle: FontStyle.italic, color: Colors.white)),
+                          fontSize: 24, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text('Rock · Salvador, BA', style: _sub()),
                 ],
