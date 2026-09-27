@@ -9,6 +9,7 @@ import 'package:msb_just/models/track.dart';
 import 'package:msb_just/services/audio_service.dart';
 import 'package:msb_just/widgets/player_cards.dart';
 import 'package:msb_just/widgets/mini_player.dart';
+import 'gallery_screen.dart';
 
 /// Tela "Tocando agora" — conceito Liquid Glass.
 /// Drop-in: no main.dart use
@@ -273,6 +274,58 @@ class _LiquidPlayerScreenState extends State<LiquidPlayerScreen>
                     ...cardsPlayerExpandido(context, widget.audioService)
                   else ...[
                     ClipeCard(conteudo: conteudoDoAlbum(widget.audioService.currentAlbum?.id), titulo: track?.title ?? ''),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => GalleryScreen(audioService: widget.audioService),
+                        ),
+                      ),
+                      child: Glass(
+                        radius: 22,
+                        child: SizedBox(
+                          height: 140,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(22),
+                                    image: const DecorationImage(
+                                      image: AssetImage('assets/775416812_18620508076026296_1192558196502584496_n.jpg'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(22),
+                                    color: Colors.black.withOpacity(0.3),
+                                  ),
+                                ),
+                              ),
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.photo_library_rounded, size: 32, color: Colors.white.withOpacity(0.9)),
+                                    const SizedBox(height: 8),
+                                    Text('Galeria de Fotos',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white.withOpacity(0.95),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     for (final a in albumnsRelacionadosDo(widget.audioService.currentAlbum?.id)) ...[
                       AlbumSpotifyCard(album: a),
