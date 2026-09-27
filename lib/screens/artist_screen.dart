@@ -27,6 +27,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
   bool _carregandoAlbum = false;
+  bool _menuAberto = false;
 
   static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
 
@@ -168,12 +169,20 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                         mode: _mode,
                         radius: 19,
                         child: GestureDetector(
-                          onTap: () => _mostrarMenuContexto(),
-                          child: SizedBox(
-                            width: 38,
-                            height: 38,
-                            child: Icon(Icons.menu_rounded,
-                                size: 22, color: Colors.white.withOpacity(0.9)),
+                          onTap: () => setState(() => _menuAberto = !_menuAberto),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (_menuAberto)
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.5),
+                                  ),
+                                ),
+                              Icon(Icons.menu_rounded,
+                                  size: 22, color: Colors.white.withOpacity(0.9)),
+                            ],
                           ),
                         ),
                       ),
@@ -574,64 +583,131 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                 ),
               ),
             ),
+          // 6 · menu de contexto
+          _menuContexto(),
         ],
       ),
     );
   }
 
-  void _mostrarMenuContexto() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 60, right: 24),
-            child: Glass(
-              radius: 16,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _itemMenu('Sobre', () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => CreditsScreen(audioService: widget.audioService),
-                      ),
-                    );
-                  }),
-                  Divider(color: Colors.white.withOpacity(0.2), height: 1),
-                  _itemMenu('Direitos Autorais', () {
-                    Navigator.pop(context);
-                  }),
-                  Divider(color: Colors.white.withOpacity(0.2), height: 1),
-                  _itemMenu('Ajuda', () {
-                    Navigator.pop(context);
-                  }),
-                ],
+  Widget _menuContexto() {
+    const itens = [
+      ('Sobre', Icons.info_outline_rounded),
+      ('Direitos Autorais', Icons.copyright_rounded),
+      ('Ajuda', Icons.help_outline_rounded),
+    ];
+    final topo = MediaQuery.of(context).padding.top + 8 + 38 + 8;
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: !_menuAberto,
+        child: Stack(
+          children: [
+            // fundo: toque fora fecha
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => setState(() => _menuAberto = false),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _menuAberto ? 1 : 0,
+                  child: Container(color: const Color(0xFF06050A).withOpacity(0.35)),
+                ),
               ),
             ),
+            Positioned(
+              top: topo,
+              right: 24,
+              width: 220,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _menuAberto ? 1 : 0,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 320),
+                  curve: const Cubic(.32, 1.3, .5, 1),
+                  alignment: Alignment.topRight,
+                  scale: _menuAberto ? 1 : 0.9,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF14121E).withOpacity(0.72),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 50,
+                                offset: const Offset(0, 20)),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (var k = 0; k < itens.length; k++)
+                              _itemMenu(itens[k].$1, itens[k].$2, primeiro: k == 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _itemMenu(String rotulo, IconData icone, {required bool primeiro}) {
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        highlightColor: Colors.white.withOpacity(0.08),
+        splashColor: Colors.white.withOpacity(0.06),
+        onTap: () {
+          setState(() => _menuAberto = false);
+          _abrirItem(rotulo);
+        },
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: primeiro
+                ? null
+                : Border(top: BorderSide(color: Colors.white.withOpacity(0.08))),
+          ),
+          child: Row(
+            children: [
+              Icon(icone, size: 17, color: Colors.white.withOpacity(0.85)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(rotulo,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white.withOpacity(0.5)),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _itemMenu(String label, VoidCallback onTap) => GestureDetector(
-    onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: Colors.white,
-        ),
-      ),
-    ),
-  );
+  void _abrirItem(String rotulo) {
+    switch (rotulo) {
+      case 'Sobre':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CreditsScreen(audioService: widget.audioService)));
+        break;
+      case 'Direitos Autorais':
+        break;
+      case 'Ajuda':
+        break;
+    }
+  }
 
   Widget _botaoVidro(IconData icon, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
