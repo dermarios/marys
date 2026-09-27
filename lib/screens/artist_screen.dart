@@ -25,7 +25,6 @@ class ArtistScreen extends StatefulWidget {
 class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _blobs;
   final GlassMode _mode = GlassMode.fosco;
-  bool _curtido = false;
   bool _carregandoAlbum = false;
 
   static const _foto = 'assets/33898823_1876726852378352_5577473749248114688_n.jpg';
@@ -253,8 +252,8 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                       ),
                       const SizedBox(width: 10),
                       _botaoVidro(
-                        _curtido ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        () => setState(() => _curtido = !_curtido),
+                        Icons.share_rounded,
+                        () => abrirLink('https://open.spotify.com/artist/6Iy4SoBidxexl9DrwV3kRE?si=GNdH2ThdQ_WS5f22o0F7mA&utm_source=whatsapp'),
                       ),
                     ],
                   ),
