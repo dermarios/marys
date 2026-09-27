@@ -186,7 +186,7 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: -10,
+                  top: 6,
                   left: 0,
                   right: 0,
                   child: Center(
