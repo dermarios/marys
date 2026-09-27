@@ -408,17 +408,6 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
               ],
             ),
           ),
-          if (tocando)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white.withOpacity(0.5)),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
