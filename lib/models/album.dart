@@ -78,7 +78,7 @@ final kAlbums = [
       'assets/albuns/just/fotos/598015977_25618975347726836_2284519281725335253_n.jpg',
       'assets/albuns/just/fotos/599940809_25618094744481563_5618017685269495687_n.jpg',
       'assets/albuns/just/fotos/647394672_26380402064917490_2009591765790192284_n.jpg',
-      'assets/albuns/just/fotos/648933701_26380725371551826_3678365400862571829_n.jpg',
+      'assets/albuns/just/fotos/648933701_26380725371551826_3678365400862571929_n.jpg',
     ],
     tracks: [
       Track(
