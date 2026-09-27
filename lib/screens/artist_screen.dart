@@ -127,7 +127,9 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
               ),
             ),
           ),
-          // 5 · conteúdo
+          // 5 · menu de contexto
+          _menuContexto(),
+          // 6 · conteúdo
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
@@ -587,8 +589,6 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                 ),
               ),
             ),
-          // 6 · menu de contexto
-          _menuContexto(),
         ],
       ),
     );
