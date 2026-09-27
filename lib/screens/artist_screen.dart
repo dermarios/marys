@@ -10,6 +10,7 @@ import 'package:msb_just/models/track.dart';
 import 'package:msb_just/data/track_content.dart';
 import 'liquid_player_screen.dart';
 import 'library_screen.dart';
+import 'credits_screen.dart';
 
 /// Tela "Artista" — evolução da SideScreen: a foto sangra na tela inteira e os
 /// blobs líquidos entram POR CIMA dela em blend soft-light / screen, então a
@@ -163,19 +164,37 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => LiquidPlayerScreen(audioService: widget.audioService, expandido: false),
-                          ),
-                        ),
-                        child: Glass(
-                          mode: _mode,
-                          radius: 19,
+                      Glass(
+                        mode: _mode,
+                        radius: 19,
+                        child: PopupMenuButton(
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'sobre',
+                              child: Text('Sobre'),
+                            ),
+                            const PopupMenuItem(
+                              value: 'direitos',
+                              child: Text('Direitos Autorais'),
+                            ),
+                            const PopupMenuItem(
+                              value: 'ajuda',
+                              child: Text('Ajuda'),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            if (value == 'sobre') {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => CreditsScreen(),
+                                ),
+                              );
+                            }
+                          },
                           child: SizedBox(
                             width: 38,
                             height: 38,
-                            child: Icon(Icons.chevron_right_rounded,
+                            child: Icon(Icons.menu_rounded,
                                 size: 22, color: Colors.white.withOpacity(0.9)),
                           ),
                         ),
@@ -314,7 +333,7 @@ class _ArtistScreenState extends State<ArtistScreen> with SingleTickerProviderSt
                                         ),
                                       ),
                                       TextSpan(
-                                        text: ' ${album.year}',
+                                        text: ' - ${album.year}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w300,
