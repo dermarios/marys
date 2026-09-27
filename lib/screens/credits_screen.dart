@@ -357,7 +357,7 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
   }
 
   Widget _tech((String, String, String, String) t, List<Color> cores) {
-    final (nome, papel, versao, marca) = t;
+    final (nome, papel, versao, _) = t;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -367,19 +367,6 @@ class _CreditsScreenState extends State<CreditsScreen> with SingleTickerProvider
       ),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: LinearGradient(colors: cores.take(2).toList()),
-            ),
-            child: Text(marca,
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
-          ),
-          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
