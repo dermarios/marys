@@ -34,6 +34,8 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Marys uses local network</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Marys needs access to your microphone to record audio</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
